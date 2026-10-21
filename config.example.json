@@ -1,5 +1,7 @@
 {
   "vault": "../life-project/knowledge-map/learning-vault",
   "basePath": "/qa/",
-  "title": "telingc atlas"
+  "title": "telingc atlas",
+  "github": {"repository": "telingc/qa", "branch": "gh-pages"},
+  "comments": {"enabled": true, "repository": "telingc/qa", "repoId": "", "category": "Atlas comments", "categoryId": ""}
 }

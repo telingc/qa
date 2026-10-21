@@ -4,5 +4,6 @@ dist/
 .preview/
 config.local.json
 publish-review.json
+.publish-state.json
 test-results/
 *.log

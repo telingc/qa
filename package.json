@@ -1,12 +1,12 @@
 {
   "name": "quiet-atlas-public",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "A static reading window into Quiet Atlas drafts.",
   "scripts": {
     "build": "node scripts/build.cjs",
     "start": "node scripts/serve.cjs",
-    "test": "node --test test/export.test.cjs",
+    "test": "node --test test/*.test.cjs",
     "publish": "node scripts/publish.cjs"
   },
   "dependencies": {

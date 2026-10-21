@@ -1,5 +1,17 @@
 # QA 0.1.0 — local release verification
 
+## 0.2.0 update — 2026-10-21
+
+Scope: stage-independent source publication and separate giscus discussions for node articles and examples. The original blog and local Obsidian plugin are not changed. The author-owned README stays empty.
+
+All 13 automated checks pass, including a real isolated bare Git repository: all scripts without stage gates; original bytes and nested/encoded file names; same-name files in Nodes vs Examples; source updates and deletion; stale snapshot rejection; normal publication history without force push; missing-comment-configuration blocks; last good output survives a failed build; private Markdown stays local; linked source directories cannot escape the vault. Client tests cover deferred loading, single mounting, network failure/retry and rejection of unrelated window messages.
+
+The actual current vault generates 11 articles, 6 examples, 7 images and 1 source file, with no export warnings. In the Codex in-app browser, all 17 generated article/example pages have exactly one comment section at 1280/390/320px; all 51 checks have no page-wide horizontal overflow. The actual Boundary Conditions & Uniqueness Theorems article resolves “The script” to the matching GitHub gh-pages/code/Nodes file. Local image/math/code rendering is preserved. Reports and screenshots: `E:/workspace/life-project/output/qa-code-comments-20261021/`.
+
+The live giscus configuration page currently reports that telingc/qa cannot yet use giscus; no repository/category IDs are available from that page. GitHub's unauthenticated repository API returned HTTP 403. App installation, Discussions/category setup and final live widget access remain pending user action. No real test comment was posted. Browser checks at this stage verify the real generated GitHub discussion fallback, while the optional giscus client is covered separately by simulated client tests; these are not claimed as a completed live comments test.
+
+Setup is documented in COMMENTS-SETUP.md. The original manual prepare/review/confirm publication flow remains; it will not publish an enabled-but-unconfigured giscus feature. Source files are emitted into the same gh-pages snapshot as the website, so their GitHub URLs become reachable when that reviewed snapshot is published.
+
 Date: 2026-10-18, Asia/Shanghai. Independent checkout: `E:/workspace/qa`.
 
 ## Result

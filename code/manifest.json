@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "repository": "telingc/qa",
+  "branch": "gh-pages",
+  "files": [
+    {
+      "source": "Nodes/scripts/boundary_conditions_and_uniqueness_theorem.py",
+      "path": "code/Nodes/boundary_conditions_and_uniqueness_theorem.py",
+      "url": "https://github.com/telingc/qa/blob/gh-pages/code/Nodes/boundary_conditions_and_uniqueness_theorem.py",
+      "sha256": "e172d1290df6dcfb42dc4ceef3d36ad6d027228e8f758d8cf14a2bef4d783512",
+      "size": 3543
+    }
+  ]
+}

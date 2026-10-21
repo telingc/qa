@@ -7,3 +7,5 @@
 @media print{.site-header,.article-nav,.map-actions,footer{display:none}body{background:white;color:black}.table-scroll,.formula,.post-content pre{overflow:visible}.post-content table{font-size:12px}a{color:inherit}}
 .inline-formula{display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle;padding:2px 0;overflow-wrap:normal}
 .site-brand{display:flex;align-items:center;gap:12px;min-height:56px}.site-mark{display:block;width:40px;height:40px;user-select:none}.blog-link{display:inline-block;margin-top:8px}
+.comments{margin-top:44px;padding-top:8px;border-top:1px solid #333;min-width:0;overflow-wrap:anywhere}.comments-fallback,.comments-status{color:var(--muted);font-size:15px}.comments-status:empty{display:none}.giscus,.giscus-frame{width:100%;max-width:100%;min-width:0}.comments-retry{font:inherit;font-size:15px;color:var(--link);background:none;border:1px solid #444;border-radius:3px;padding:8px 12px;cursor:pointer}.comments-retry[hidden]{display:none}
+@media print{.comments{display:none}}

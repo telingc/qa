@@ -2,10 +2,10 @@
 // Third-party comments are optional: the article and GitHub link always remain usable.
 for(const section of document.querySelectorAll('.comments')){
   const container=section.querySelector('[data-comment-options]');if(!container)continue;
-  const status=section.querySelector('.comments-status'),retry=section.querySelector('.comments-retry');let mounted=false;
-  const failed=()=>{status.textContent='Comments are unavailable. You can still open the discussion on GitHub.';retry.hidden=false;};
+  const status=section.querySelector('.comments-status'),retry=section.querySelector('.comments-retry'),fallback=section.querySelector('.comments-fallback');let mounted=false;
+  const failed=()=>{status.textContent='Comments are unavailable.';retry.hidden=false;fallback.hidden=false;};
   const mount=()=>{
-    if(mounted)return;mounted=true;retry.hidden=true;status.textContent='';container.replaceChildren();
+    if(mounted)return;mounted=true;retry.hidden=true;fallback.hidden=true;status.textContent='';container.replaceChildren();
     const script=document.createElement('script');script.src='https://giscus.app/client.js';script.async=true;script.crossOrigin='anonymous';
     for(const [key,value]of Object.entries(JSON.parse(container.dataset.commentOptions)))script.setAttribute('data-'+key,value);
     script.addEventListener('error',failed,{once:true});container.append(script);

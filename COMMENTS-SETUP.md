@@ -12,9 +12,11 @@
 
 ## 一次性启用 giscus
 
+2026-10-21 已从官方配置页读取并设置 QA 的公开仓库/分类 ID，默认使用 Announcements。正常使用无需重复配置；以下步骤供重建或更换仓库时参考。
+
 1. 用自己的 GitHub 账号打开 `https://github.com/telingc/qa/settings`，在 General → Features 启用 Discussions。
 2. 打开 `https://github.com/apps/giscus` 安装官方 App，只选择 `telingc/qa`，不需要授权博客仓库。安装会授予该 App 对所选仓库 Discussions 的访问权限，按 GitHub 页面实际显示的权限核对。
-3. 在 Discussions 创建分类 `Atlas comments`，建议选择 Announcements 类型。
+3. 直接使用现有默认分类 `Announcements`，无需新建分类；如需独立分组，也可创建 Announcements 类型的新分类。
 4. 打开 `https://giscus.app/`，仓库填 `telingc/qa`，选择该分类。把生成配置中的 `data-repo-id` 和 `data-category-id` 分别填入 `config.local.json` 的 `comments.repoId` 和 `comments.categoryId`；category 填真实分类名。
 5. 配置文件可从 config.example.json 复制，保留 vault、basePath、title 与 github 配置。ID 是公开标识，不是 token；这里不使用 GitHub PAT 或模型 API key。
 
@@ -28,7 +30,7 @@
     "enabled": true,
     "repository": "telingc/qa",
     "repoId": "",
-    "category": "Atlas comments",
+    "category": "Announcements",
     "categoryId": ""
   }
 }

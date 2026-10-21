@@ -12,6 +12,7 @@ function commentsHTML(note,kind,config){
   if(!config.enabled)return '';
   const term=commentTerm(kind,note.id),link=`https://github.com/${config.repository}/discussions?discussions_q=${encodeURIComponent('"'+term+'"')}`;
   const options={repo:config.repository,'repo-id':config.repoId,category:config.category,'category-id':config.categoryId,mapping:'specific',term,strict:'1','reactions-enabled':'0','emit-metadata':'0','input-position':'bottom',theme:'dark_dimmed',lang:'en',loading:'lazy'};
-  return `<section class="comments" aria-labelledby="comments-heading"><h2 id="comments-heading">Comments</h2><p class="comments-intro">Questions and corrections are welcome. <a href="${esc(link)}">Open the discussion on GitHub</a>.</p>${config.ready?`<div class="giscus" data-comment-options="${esc(JSON.stringify(options))}"></div><p class="comments-status" role="status" aria-live="polite"></p><button class="comments-retry" type="button" hidden>Retry comments</button>`:''}</section>`;
+  const fallback=`<p class="comments-fallback"${config.ready?' hidden':''}><a href="${esc(link)}">View comments on GitHub</a></p>`;
+  return `<section class="comments" aria-label="Comments">${config.ready?`<div class="giscus" data-comment-options="${esc(JSON.stringify(options))}"></div><p class="comments-status" role="status" aria-live="polite"></p><button class="comments-retry" type="button" hidden>Retry comments</button>`:''}${fallback}</section>`;
 }
 module.exports={commentConfig,commentTerm,commentsHTML};

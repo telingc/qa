@@ -57,7 +57,7 @@ test('Node and example comments have separate stable identities, survive title c
 
 test('Pending configuration keeps a GitHub fallback but prevents a misleading live publish; explicit disable works offline',()=>{
   const f=fixture(),out=f.out(),r=build({vault:f.vault,outDir:out});assert.equal(r.comments.ready,false);
-  assert.match(htmlFor(out,r.articles[0]),/Open the discussion on GitHub/);assert.doesNotMatch(htmlFor(out,r.articles[0]),/data-comment-options|assets\/comments.js/);
+  assert.match(htmlFor(out,r.articles[0]),/View comments on GitHub/);assert.doesNotMatch(htmlFor(out,r.articles[0]),/data-comment-options|assets\/comments.js/);
   assert.throws(()=>assertPublishable(r),/not configured/);
   const off=f.out(),disabled=build({vault:f.vault,outDir:off,comments:{enabled:false}});assert.doesNotMatch(htmlFor(off,disabled.articles[0]),/class="comments"/);assert.doesNotThrow(()=>assertPublishable(disabled));
   const missing=f.out();f.note('Nodes/Public.md',{atlas_id:'same-id',atlas_status:2},'[Missing](scripts/never.py)');const broken=build({vault:f.vault,outDir:missing,comments});assert.match(broken.warnings[0],/Source link unavailable/);assert.throws(()=>assertPublishable(broken),/warnings/);

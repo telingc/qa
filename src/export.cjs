@@ -145,6 +145,8 @@ function build({vault,basePath='/qa/',title='telingc atlas',outDir,sourceRoot=pa
   for(const [name,bytes]of assets)write('assets/images/'+name,bytes);
   for(const file of sources.files)write(file.path,file.bytes);
   write('code/manifest.json',JSON.stringify({version:1,repository:sources.repository,branch:sources.branch,files:publicSources(sources)},null,2)+'\n');
+  // A public snapshot is a byte-for-byte artifact, including CRLF source files.
+  write('.gitattributes','* -text\n');
   write('.nojekyll','');
   const report={schemaVersion:2,articles:data.nodes.map(n=>({id:n.id,title:n.title,url:base+n.href})),examples:data.examples.map(e=>({id:e.id,parent:e.parent,title:e.title,url:base+e.href})),images:assets.size,sources:publicSources(sources),skippedSources:sources.skipped,sourceTarget:{repository:sources.repository,branch:sources.branch},comments:commentSettings,warnings:[...new Set(warnings)]};
   return report;

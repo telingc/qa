@@ -5,7 +5,7 @@ test('Actual publisher keeps stage-independent sources, reviews changes, preserv
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'qa-publish-check-')),repo=path.join(root,'checkout'),remote=path.join(root,'qa.git'),vault=path.join(root,'vault');
   fs.mkdirSync(repo);for(const folder of ['src','web','scripts'])fs.cpSync(path.join(source,folder),path.join(repo,folder),{recursive:true});
   const dependencies=path.dirname(path.dirname(require.resolve('yaml/package.json')));
-  const env={...process.env,NODE_PATH:[dependencies,process.env.NODE_PATH].filter(Boolean).join(path.delimiter),GIT_AUTHOR_NAME:'QA isolated test',GIT_AUTHOR_EMAIL:'qa@example.invalid',GIT_COMMITTER_NAME:'QA isolated test',GIT_COMMITTER_EMAIL:'qa@example.invalid',QA_VAULT:vault};
+  const env={...process.env,GIT_CONFIG_COUNT:'1',GIT_CONFIG_KEY_0:'core.autocrlf',GIT_CONFIG_VALUE_0:'true',NODE_PATH:[dependencies,process.env.NODE_PATH].filter(Boolean).join(path.delimiter),GIT_AUTHOR_NAME:'QA isolated test',GIT_AUTHOR_EMAIL:'qa@example.invalid',GIT_COMMITTER_NAME:'QA isolated test',GIT_COMMITTER_EMAIL:'qa@example.invalid',QA_VAULT:vault};
   const git=(directory,...args)=>cp.execFileSync('git',['-c','safe.directory='+directory,'-C',directory,...args],{encoding:'utf8',env,stdio:['ignore','pipe','pipe']}).trim();
   cp.execFileSync('git',['init','--bare',remote],{env,stdio:'pipe'});git(repo,'init','-b','main');git(repo,'remote','add','origin',remote);
   const write=(name,text)=>{const file=path.join(vault,'Knowledge Atlas',name);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,text);return file;};
@@ -17,7 +17,7 @@ test('Actual publisher keeps stage-independent sources, reviews changes, preserv
   const run=(confirm=false)=>cp.spawnSync(process.execPath,[path.join(repo,'scripts/publish.cjs'),...(confirm?['--confirm']:[])],{cwd:repo,env,encoding:'utf8',timeout:30000});
   const ok=result=>assert.equal(result.status,0,result.stdout+'\n'+result.stderr);
   ok(run());assert.equal(cp.spawnSync('git',['--git-dir',remote,'show-ref','--verify','refs/heads/gh-pages'],{env}).status,128);
-  ok(run(true));const first=git(remote,'rev-parse','gh-pages');assert.equal(git(remote,'show','gh-pages:code/Nodes/all.py'),'print("first")');
+  ok(run(true));const first=git(remote,'rev-parse','gh-pages');assert.equal(cp.execFileSync('git',['-c','safe.directory='+remote,'-C',remote,'show','gh-pages:code/Nodes/all.py'],{env,encoding:'utf8'}),'print("first")\r\n','Published source bytes survive Windows autocrlf settings');assert.equal(git(remote,'show','gh-pages:code/Nodes/all.py'),'print("first")');
   assert.equal(cp.spawnSync('git',['--git-dir',remote,'cat-file','-e','gh-pages:articles'],{env}).status,128,'Stage-zero note is not published');
   fs.writeFileSync(code,'print("second")');fs.unlinkSync(old);write('Nodes/scripts/new.py','new');ok(run());
   const review=JSON.parse(fs.readFileSync(path.join(repo,'publish-review.json'),'utf8'));

@@ -9,6 +9,13 @@
       "url": "https://github.com/telingc/qa/blob/gh-pages/code/Nodes/boundary_conditions_and_uniqueness_theorem.py",
       "sha256": "e172d1290df6dcfb42dc4ceef3d36ad6d027228e8f758d8cf14a2bef4d783512",
       "size": 3543
+    },
+    {
+      "source": "Examples/scripts/radial_field_visualization.py",
+      "path": "code/Examples/radial_field_visualization.py",
+      "url": "https://github.com/telingc/qa/blob/gh-pages/code/Examples/radial_field_visualization.py",
+      "sha256": "c396420cac89935210f4d0d756a8a758ddfcec873bc26e1dd18a2388fcd2f955",
+      "size": 9840
     }
   ]
 }

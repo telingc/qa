@@ -10,7 +10,7 @@ The actual current vault generates 11 articles, 6 examples, 7 images and 1 sourc
 
 Live follow-up on 2026-10-21: the official giscus configuration page now recognizes telingc/qa and its existing Announcements category. Public IDs are stored in config.example.json so ordinary builds work without another setup step. Real giscus widgets on the generated node and example pages both show 0 comments, Write/Preview and Sign in with GitHub. At 390px the node page has no horizontal overflow. The redundant Comments heading and introductory link are removed; a GitHub fallback appears only if the widget fails. Screenshot: output/qa-code-comments-20261021/comments-live-mobile.jpg under the life-project workspace. No real comment was posted; authenticated submission remains untested. GitHub Pages deployment is verified separately after publication.
 
-Setup is documented in COMMENTS-SETUP.md. The original manual prepare/review/confirm publication flow remains; it will not publish an enabled-but-unconfigured giscus feature. Source files are emitted into the same gh-pages snapshot as the website, so their GitHub URLs become reachable when that reviewed snapshot is published.
+Comment settings are defined in config.example.json and may be overridden in ignored config.local.json. The original manual prepare/review/confirm publication flow remains; it will not publish an enabled-but-unconfigured giscus feature. Source files are emitted into the same gh-pages snapshot as the website, so their GitHub URLs become reachable when that reviewed snapshot is published.
 
 Date: 2026-10-18, Asia/Shanghai. Independent checkout: `E:/workspace/qa`.
 

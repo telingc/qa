@@ -7,3 +7,4 @@ publish-review.json
 .publish-state.json
 test-results/
 *.log
+COMMENTS-SETUP.md

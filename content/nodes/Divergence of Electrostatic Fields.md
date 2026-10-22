@@ -1,0 +1,12 @@
+---
+id: electrostatic-divergence
+subject: Physics
+topic: Electrodynamics
+---
+## The Differential Form of Gauss' Law
+Throughout this note, we assume that $\mathbf E$ is continuously differentiable and $\rho$ is continuous in the region under consideration. The differential form follows pointwise because the integral identity holds for every sufficiently small volume $V$ with a piecewise smooth boundary in this region.
+### Divergence Theorem
+$$ \underbrace{\int_V\nabla\cdot\mathbf E\,d\tau =\oint_{\partial V}\mathbf E\cdot d\mathbf a}_{\text{Divergence Theorem}}  \underbrace{=\frac{Q_{\mathrm{enc}}}{\epsilon_0}=\frac1{\epsilon_0}\int_V\rho\,d\tau}_{\text{Gauss' Law}}$$The divergence of electrostatic fields (the differential form of Gauss' law):$$\nabla\cdot\mathbf{E}=\frac{\rho}{\epsilon_0}$$ could be inferred from the equation above.
+### Divergence's Geometric Perspective & Gauss' Law
+$$\nabla\cdot\mathbf E(\mathbf x_0) =\lim_{h\to0^+} \frac{\displaystyle\oint_{\partial B_h(\mathbf x_0)} \mathbf E\cdot d\mathbf a} {\displaystyle\frac{4\pi}{3}h^3}$$For a continuously differentiable vector field, divergence at a point is the limiting net outward flux per unit volume as an enclosing region shrinks to that point. Calculate the flux with Gauss' law$$\displaystyle\oint_{\partial B_h(\mathbf x_0)} \mathbf E\cdot \mathrm d\mathbf a=\frac{Q_{enc}}{\epsilon_0}=\frac{1}{\epsilon_0}\displaystyle\int_{B_h(\mathbf x_0)}\rho\mathrm d\tau=\frac{1}{\epsilon_0}\displaystyle\int_0^h\displaystyle\int_{\partial B_s(\mathbf x_0)}\rho\mathrm dS\mathrm ds$$And with L'Hospital: $$\lim_{h\to0^+} \frac{\displaystyle\oint_{\partial B_h(\mathbf x_0)} \mathbf E\cdot d\mathbf a} {\displaystyle\frac{4\pi}{3}h^3}=\lim_{h\to0^+} \frac{\displaystyle\frac{\partial}{\partial h}\oint_{\partial B_h(\mathbf x_0)} \mathbf E\cdot d\mathbf a} {\displaystyle\frac{\partial}{\partial h}\frac{4\pi}{3}h^3}=\lim_{h\to0^+}\frac{\displaystyle\frac{1}{\epsilon_0}\displaystyle\int_{\partial B_h(\mathbf x_0)}\rho\mathrm dS}{\displaystyle4\pi h^2}$$
+$$\lim_{h\to0^+}\frac{\displaystyle\frac{1}{\epsilon_0}\displaystyle\int_{\partial B_h(\mathbf x_0)}\rho\mathrm dS}{\displaystyle4\pi h^2}=\frac{\rho(\mathbf{x_0})}{\epsilon_0}$$

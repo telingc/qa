@@ -6,6 +6,5 @@ function sourceDiff(previous=[],next=[]){
 function assertPublishable(report){
   if(report.warnings.length)throw Error('Resolve export warnings before publishing.');
   if(report.comments.enabled&&!report.comments.ready)throw Error('Comments are not configured. Set comments.repoId, comments.category and comments.categoryId in config.local.json before publishing. No remote changes.');
-  if(report.sourceTarget.branch!=='gh-pages')throw Error('Source links must target gh-pages, the publication branch.');
 }
 module.exports={sourceDiff,assertPublishable};

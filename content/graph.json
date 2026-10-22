@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "prerequisites": {
+    "question-mv63diwx-u5jh": [
+      "coulomb-law",
+      "electric-potential",
+      "superposition"
+    ],
+    "question-mvangpxg-jthw": [
+      "question-mv8xnsjg-7y69",
+      "question-mv4vnu4t-aonx"
+    ],
+    "question-mv8xnsjg-7y69": [
+      "electric-flux"
+    ],
+    "coulomb-law": [],
+    "electrostatic-curl": [
+      "electric-flux",
+      "superposition"
+    ],
+    "electrostatic-divergence": [
+      "electric-flux"
+    ],
+    "electric-flux": [
+      "coulomb-law",
+      "superposition"
+    ],
+    "electric-potential": [
+      "electrostatic-curl"
+    ],
+    "question-mv4vnu4t-aonx": [
+      "electrostatic-curl",
+      "electrostatic-divergence"
+    ],
+    "superposition": [
+      "coulomb-law"
+    ],
+    "question-mv4vbia6-pmmj": [
+      "electric-potential"
+    ]
+  }
+}

@@ -1,13 +1,15 @@
 {
   "name": "quiet-atlas-public",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "A static reading window into Quiet Atlas drafts.",
+  "description": "A small standalone Markdown atlas with an optional Quiet Atlas importer.",
   "scripts": {
     "build": "node scripts/build.cjs",
     "start": "node scripts/serve.cjs",
     "test": "node --test test/*.test.cjs",
-    "publish": "node scripts/publish.cjs"
+    "publish": "node scripts/publish.cjs",
+    "import:atlas": "node scripts/import-atlas.cjs",
+    "help": "node scripts/help.cjs"
   },
   "dependencies": {
     "yaml": "^2.8.1",

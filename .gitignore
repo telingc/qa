@@ -8,3 +8,7 @@ publish-review.json
 test-results/
 *.log
 COMMENTS-SETUP.md
+atlas-import.local.json
+import-review.json
+.content-*/
+.atlas-import.next-*

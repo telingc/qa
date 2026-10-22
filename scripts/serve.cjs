@@ -1,7 +1,7 @@
 'use strict';
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),dist=path.join(root,'dist'),port=Number(process.env.PORT||5190);
-const configFile=path.join(root,'config.local.json'),config=JSON.parse(fs.readFileSync(fs.existsSync(configFile)?configFile:path.join(root,'config.example.json'),'utf8')),base=config.basePath||'/qa/';
+const {readConfig}=require('../src/config.cjs'),config=readConfig(root),base=config.basePath;
 if(!fs.existsSync(dist)){console.error('Run npm run build first.');process.exit(1);}
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.woff2':'font/woff2','.woff':'font/woff','.ttf':'font/ttf'};
 http.createServer((req,res)=>{

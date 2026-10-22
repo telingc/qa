@@ -1,10 +1,10 @@
 'use strict';
 const {githubTarget}=require('./sources.cjs');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function commentConfig(options={},repository='telingc/qa'){
+function commentConfig(options={enabled:false},repository=''){
   const {repository:repo}=githubTarget({repository:options.repository||repository});
   if(options.enabled===false)return {enabled:false,ready:false,repository:repo,missing:[]};
-  const missing=['repoId','category','categoryId'].filter(key=>typeof options[key]!=='string'||!options[key].trim());
+  const missing=['repoId','category','categoryId'].filter(key=>typeof options[key]!=='string'||!options[key].trim());if(!repo)missing.push('repository');
   return {enabled:true,ready:!missing.length,repository:repo,repoId:options.repoId||'',category:options.category||'',categoryId:options.categoryId||'',missing};
 }
 function commentTerm(kind,id){return `qa:${kind}:${id}`;}

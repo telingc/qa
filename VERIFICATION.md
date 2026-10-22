@@ -1,3 +1,17 @@
+# QA 0.3.0 — standalone Markdown content
+
+Date: 2026-10-22, Asia/Shanghai.
+
+Build reads only contentDir. Quiet Atlas is an optional, separately reviewed one-way import. Public source Markdown, relationships, images and source code are committed to main. Existing node/example IDs, article paths and giscus terms are retained. Site identity and repository are configurable; neutral defaults disable comments. Fork builds use their repository for source links and do not reuse another repository's giscus configuration.
+
+Validation: 11 focused tests cover imports, stage withdrawal, idempotence, local/manual edits, stale previews, invalid-input preservation, symbolic-link rejection, zero-article source publication, byte preservation, comments, math/HTML sanitization, graph integrity and a real isolated bare Git publisher in Actions/branch modes. Actual content: 11 articles, 7 examples, 8 images, 2 source files; no warnings. All 18 article/example pages passed at 1280, 390 and 320px (54 checks), with no horizontal overflow or broken images.
+
+A disposable example verified that an ordinary browser reload loads a new graph fingerprint and discards a prior version's camera state. The fixture was removed and real content rebuilt. Graph requests revalidate cache; graph, JS and CSS use content-specific resource URLs. Browser reports/screenshots are under E:/workspace/life-project/output/qa-standalone-20261022/.
+
+The separate clean-computer acceptance exercise was explicitly skipped by the user. Live Actions deployment is verified separately after installation; local checks alone do not establish hosted deployment success. No authenticated test comments were submitted. The original blog, author README and source vault are unchanged.
+
+---
+
 # QA 0.1.0 — local release verification
 
 ## 0.2.0 update — 2026-10-21

@@ -9,7 +9,7 @@ if(!host){
 }else{
   const svg=document.getElementById('atlas-map'),ns='http://www.w3.org/2000/svg';
   const shape=(tag,attrs={})=>{const el=document.createElementNS(ns,tag);for(const [key,val]of Object.entries(attrs))el.setAttribute(key,val);return el;};
-  const camera={x:0,y:0,scale:1},storageKey='qa-atlas-camera:'+location.pathname,pointers=new Map();let scene,graph,drag=null,pinch=null,selected=null;
+  const camera={x:0,y:0,scale:1},pointers=new Map();let storageKey,scene,graph,drag=null,pinch=null,selected=null;
   const apply=()=>{scene.setAttribute('transform',`translate(${camera.x} ${camera.y}) scale(${camera.scale})`);};
   const save=()=>{try{sessionStorage.setItem(storageKey,JSON.stringify(camera));}catch{}};
   const select=id=>{
@@ -21,8 +21,8 @@ if(!host){
   };
   const fit=()=>{const w=host.clientWidth,h=host.clientHeight;camera.scale=Math.min(1.15,(w-36)/graph.width,(h-40)/graph.height);camera.x=(w-graph.width*camera.scale)/2;camera.y=(h-graph.height*camera.scale)/2;apply();};
   function labelLines(title,max=22){const words=title.split(/\s+/),lines=[''];for(const word of words){const last=lines.length-1;if((lines[last]+' '+word).trim().length<=max||!lines[last])lines[last]=(lines[last]+' '+word).trim();else lines.push(word);}return lines.slice(0,2).map((line,i)=>i===1&&lines.length>2?line.slice(0,max-1)+'…':line);}
-  fetch('graph.json').then(r=>{if(!r.ok)throw Error('Could not load the map.');return r.json();}).then(data=>{
-    graph=data;scene=shape('g');svg.append(scene);const defs=shape('defs'),marker=shape('marker',{id:'arrow',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:6,markerHeight:6,orient:'auto-start-reverse'});marker.append(shape('path',{d:'M 0 1 L 9 5 L 0 9',fill:'none',stroke:'#697482','stroke-width':1.2}));defs.append(marker);svg.prepend(defs);
+  fetch(document.body.dataset.graph||'graph.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('Could not load the map.');return r.json();}).then(data=>{
+    graph=data;storageKey='qa-atlas-camera:'+location.pathname+':'+(graph.dataVersion||'legacy');scene=shape('g');svg.append(scene);const defs=shape('defs'),marker=shape('marker',{id:'arrow',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:6,markerHeight:6,orient:'auto-start-reverse'});marker.append(shape('path',{d:'M 0 1 L 9 5 L 0 9',fill:'none',stroke:'#697482','stroke-width':1.2}));defs.append(marker);svg.prepend(defs);
     for(const edge of graph.edges){const p=shape('path',{d:edge.path,class:'graph-edge '+edge.kind});if(edge.kind==='prerequisite')p.setAttribute('marker-end','url(#arrow)');scene.append(p);}
     for(const node of graph.nodes){const group=shape('g',{class:'graph-node '+node.kind,transform:`translate(${node.x} ${node.y})`,tabindex:0,role:'button','aria-label':node.title+(node.kind==='example'?', example':''),'aria-pressed':'false'});group.dataset.id=node.id;
       group.append(shape('rect',{x:-node.w/2,y:-node.h/2,width:node.w,height:node.h,rx:node.kind==='example'?14:5}));

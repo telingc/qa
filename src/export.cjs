@@ -7,31 +7,8 @@ const {commentConfig,commentsHTML}=require('./comments.cjs');
 const hash=s=>crypto.createHash('sha256').update(s).digest('hex');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slug=id=>String(id).normalize('NFKD').replace(/[^a-zA-Z0-9-]+/g,'-').replace(/^-|-$/g,'').toLowerCase().slice(0,60)+'-'+hash(String(id)).slice(0,8);
-const domains={electrostatics:'Electrostatics',physics:'Physics',vector:'Vector calculus',mathematics:'Mathematics',computing:'Computer science',economics:'Economics'};
-const subject=d=>['vector','mathematics'].includes(d)?'Mathematics':['electrostatics','physics'].includes(d)?'Physics':domains[d]||'Other';
-function readNotes(vault,folder){
-  const dir=path.join(vault,'Knowledge Atlas',folder);if(!fs.existsSync(dir))return [];if(fs.lstatSync(dir).isSymbolicLink())throw Error('Note directories must not be symbolic links');
-  const walk=d=>fs.readdirSync(d,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name)).flatMap(e=>e.isSymbolicLink()?[]:e.isDirectory()?walk(path.join(d,e.name)):e.name.endsWith('.md')?[path.join(d,e.name)]:[]);
-  return walk(dir).map(file=>{const source=fs.readFileSync(file,'utf8'),match=source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);let matter={};
-    if(match){matter=YAML.parse(match[1],{uniqueKeys:true,maxAliasCount:30});if(!matter||typeof matter!=='object'||Array.isArray(matter))throw Error('Invalid properties: '+file);}
-    return {file,source,title:path.basename(file,'.md'),matter,body:match?source.slice(match[0].length):source};
-  });
-}
-function snapshot(vault){
-  vault=fs.realpathSync(vault);
-  const allNodes=readNotes(vault,'Nodes').filter(n=>n.matter.atlas_id),allExamples=readNotes(vault,'Examples').filter(n=>n.matter.atlas_example_id);
-  for(const [notes,key]of [[allNodes,'atlas_id'],[allExamples,'atlas_example_id']]){const seen=new Set();for(const note of notes){note.id=String(note.matter[key]);if(seen.has(note.id))throw Error('Duplicate ID: '+note.id);seen.add(note.id);}}
-  for(const n of allNodes){n.stage=Number(n.matter.atlas_status??0);if(!Number.isInteger(n.stage)||n.stage<0||n.stage>3)throw Error('Invalid stage: '+n.title);}
-  const graph=JSON.parse(fs.readFileSync(path.join(vault,'Knowledge Atlas/graph.json'),'utf8'));
-  if(graph.version!==1||!graph.prerequisites||Array.isArray(graph.prerequisites))throw Error('Unsupported graph format');
-  for(const list of Object.values(graph.prerequisites))if(!Array.isArray(list)||list.some(x=>typeof x!=='string'))throw Error('Invalid graph relationships');
-  const nodes=allNodes.filter(n=>n.stage>=1).map(n=>({...n,domain:String(n.matter.atlas_domain||'other'),href:'articles/'+slug(n.id)+'/'}));
-  const byId=new Map(nodes.map(n=>[n.id,n]));
-  for(const n of nodes)n.prerequisites=[...new Set(graph.prerequisites[n.id]||[])].filter(id=>byId.has(id));
-  const examples=allExamples.filter(e=>byId.get(String(e.matter.atlas_node_id))?.stage>=2).map(e=>({...e,parent:String(e.matter.atlas_node_id),href:'examples/'+slug(e.id)+'/'}));
-  return {vault,nodes,examples,allNotes:[...allNodes,...allExamples]};
-}
-function makeRenderer(data,base,assets,warnings,sources){
+const {snapshot}=require('./content.cjs');
+function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
   const notesByFile=new Map(data.allNotes.map(n=>[path.resolve(n.file),n]));
   const published=new Map([...data.nodes,...data.examples].map(n=>[n.file,n]));
   const listFiles=dir=>fs.readdirSync(dir,{withFileTypes:true}).filter(e=>!e.name.startsWith('.')&&!e.isSymbolicLink()).flatMap(e=>e.isDirectory()?listFiles(path.join(dir,e.name)):[path.join(dir,e.name)]);
@@ -46,21 +23,22 @@ function makeRenderer(data,base,assets,warnings,sources){
     if(matches.length===1)return matches[0].file;
     const basename=path.basename(filePart),assetsByName=vaultFiles.filter(p=>path.basename(p)===basename||!path.extname(filePart)&&path.basename(p)===basename+'.md');
     if(assetsByName.length===1)return assetsByName[0];
-    const imageDir=path.join(data.vault,'Knowledge Atlas/Examples/Images');
-    if(!/[\\/]/.test(filePart)&&fs.existsSync(path.join(imageDir,filePart)))return fs.realpathSync(path.join(imageDir,filePart));
     return null;
   };
   const localImage=(raw,from)=>{
     if(/^https?:\/\//i.test(raw)){warnings.push('External image omitted in '+path.basename(from));return null;}
     const file=resolve(raw,from);if(!file||!file.startsWith(data.vault+path.sep)||! /\.(png|jpe?g|gif|webp|avif)$/i.test(file)){warnings.push('Image unavailable in '+path.basename(from)+': '+raw);return null;}
-    const bytes=fs.readFileSync(file),name=hash(bytes).slice(0,24)+path.extname(file).toLowerCase();assets.set(name,bytes);return base+'assets/images/'+name;
+    const bytes=fs.readFileSync(file),name=hash(bytes).slice(0,24)+path.extname(file).toLowerCase();assets.set(name,bytes);onReference({from,raw,kind:'image',name,file});return base+'assets/images/'+name;
   };
   const localLink=(raw,from)=>{
     if(/^(https?:|mailto:|#)/i.test(raw))return raw;
     const file=resolve(raw,from),note=published.get(file);
     const code=sources.files.find(source=>source.file===file);
-    if(code)return code.url+(raw.includes('#')?'#'+encodeURIComponent(raw.split('#').slice(1).join('#')):'');
-    if(note)return base+note.href+(raw.includes('#')?'#'+encodeURIComponent(raw.split('#').slice(1).join('#')):'');
+    if(code){onReference({from,raw,kind:'code',file,path:code.path});return (code.url||base+code.path)+(raw.includes('#')?'#'+encodeURIComponent(raw.split('#').slice(1).join('#')):'');
+    }
+    if(note){onReference({from,raw,kind:'note',file});return base+note.href+(raw.includes('#')?'#'+encodeURIComponent(raw.split('#').slice(1).join('#')):'');
+    }
+    onReference({from,raw,kind:'unpublished'});
     if(/(?:^|\/)scripts\//.test(raw))warnings.push('Source link unavailable in '+path.basename(from)+': '+raw);
     // Ordinary links to area notes or private nodes remain plain text. They do not create prerequisites.
     return null;
@@ -109,7 +87,7 @@ function makeRenderer(data,base,assets,warnings,sources){
 function graphData(data,base){
   const counts=new Map();for(const e of data.examples)counts.set(e.parent,(counts.get(e.parent)||0)+1);
   const layout=graphLayout(data.nodes.map(n=>({...n,layoutHeight:counts.has(n.id)?350:110})));
-  const nodes=data.nodes.map(n=>({id:n.id,title:n.title,kind:'knowledge',domain:domains[n.domain]||n.domain,href:base+n.href,...layout.positions.get(n.id),w:236,h:84}));
+  const nodes=data.nodes.map(n=>({id:n.id,title:n.title,kind:'knowledge',domain:n.domain,href:base+n.href,...layout.positions.get(n.id),w:236,h:84}));
   const edges=layout.edges.map(e=>({source:e.source,target:e.target,kind:'prerequisite',path:graphEdgePath(e.points,false,e.points.length>2)}));
   for(const n of data.nodes){const parent=layout.positions.get(n.id),examples=data.examples.filter(e=>e.parent===n.id);
     if(examples.length>4)throw Error('More than four examples for '+n.title+'; source files preserved');
@@ -120,26 +98,30 @@ function graphData(data,base){
   }
   return {version:1,nodes,edges,width:layout.width,height:layout.height};
 }
-function build({vault,basePath='/qa/',title='telingc atlas',outDir,sourceRoot=path.resolve(__dirname,'..'),github={},comments={}}){
+function build({contentDir,basePath='/qa/',title='My atlas',tagline='A learning process, left open.',intro='Working notes. Questions, attempts, and revisions.',blog=null,outDir,sourceRoot=path.resolve(__dirname,'..'),github={},comments={enabled:false}}){
   if(!/^\/[a-zA-Z0-9_\/-]*\/$/.test(basePath)&&basePath!=='/')throw Error('basePath must be an absolute URL path ending in /');
-  const data=snapshot(vault),sources=collectSources(data.vault,github),commentSettings=commentConfig(comments,sources.repository);outDir=path.resolve(outDir);if(outDir===data.vault||outDir.startsWith(data.vault+path.sep)||data.vault.startsWith(outDir+path.sep))throw Error('Output must be separate from the vault');
+  const data=snapshot(contentDir),sources=collectSources(data.vault,github),commentSettings=commentConfig(comments,sources.repository);outDir=path.resolve(outDir);if(outDir===data.vault||outDir.startsWith(data.vault+path.sep)||data.vault.startsWith(outDir+path.sep))throw Error('Output must be separate from content');
   if(fs.existsSync(outDir)&&fs.readdirSync(outDir).length)throw Error('Build output must be empty; use the build command for transactional replacement');
   fs.mkdirSync(outDir,{recursive:true});const write=(file,text)=>{const target=path.join(outDir,file);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,text);};
   const base=basePath,assets=new Map(),warnings=[],render=makeRenderer(data,base,assets,warnings,sources);
+  const graph=graphData(data,base),graphVersion=hash(JSON.stringify(graph)).slice(0,16);graph.dataVersion=graphVersion;
+  const graphFile='atlas/graph.'+graphVersion+'.json';
+  const assetURL=name=>base+'assets/'+name.replace(/(\.[^.]+)$/,'.'+hash(fs.readFileSync(path.join(sourceRoot,'web',name))).slice(0,16)+'$1');
+  const safeBlog=blog&&/^https?:\/\//.test(blog.url||'')?blog:null;
   const shell=(heading,content,{atlas=false,article=false,back=base}={})=>{
-    const head='<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(heading)+' · '+esc(title)+'</title><meta name="description" content="Working notes, questions, and concrete examples. A public window into an unfinished learning process."><link rel="icon" href="'+base+'assets/atlas-mark.svg" type="image/svg+xml"><link rel="stylesheet" href="'+base+'assets/main.css"><link rel="stylesheet" href="'+base+'assets/katex/katex.min.css"></head>';
+    const head='<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(heading)+' · '+esc(title)+'</title><meta name="description" content="Working notes, questions, and concrete examples. A public window into an unfinished learning process."><link rel="icon" href="'+base+'assets/atlas-mark.svg" type="image/svg+xml"><link rel="stylesheet" href="'+assetURL('main.css')+'"><link rel="stylesheet" href="'+base+'assets/katex/katex.min.css"></head>';
     const header='<header class="site-header"><div class="wrap"><div class="site-brand"><img class="site-mark" src="'+base+'assets/atlas-mark.svg" width="40" height="40" alt=""><a class="site-title" href="'+base+'">'+esc(title)+'</a></div>'+(atlas?'':'<nav><a href="'+base+'atlas/">Atlas</a></nav>')+'</div></header>';
-    const footer='<footer class="wrap"><div>A learning process, left open.</div><a class="blog-link" href="https://telingc.github.io/">telingc blog</a></footer>';
-    return head+'<body data-base="'+base+'"'+(atlas?' class="atlas-page"':'')+'>'+header+'<main class="wrap '+(atlas?'map-wrap':'')+'">'+(article?'<div class="article-nav"><a id="back-link" href="'+esc(back)+'">Back</a></div>':'')+content+'</main>'+footer+'<script src="'+base+'assets/app.js" defer></script>'+(article&&commentSettings.ready?'<script src="'+base+'assets/comments.js" defer></script>':'')+'</body></html>';
+    const footer='<footer class="wrap"><div>'+esc(tagline)+'</div>'+(safeBlog?'<a class="blog-link" href="'+esc(safeBlog.url)+'">'+esc(safeBlog.label||'Blog')+'</a>':'')+'</footer>';
+    return head+'<body data-base="'+base+'" data-graph="'+base+graphFile+'"'+(atlas?' class="atlas-page"':'')+'>'+header+'<main class="wrap '+(atlas?'map-wrap':'')+'">'+(article?'<div class="article-nav"><a id="back-link" href="'+esc(back)+'">Back</a></div>':'')+content+'</main>'+footer+'<script src="'+assetURL('app.js')+'" defer></script>'+(article&&commentSettings.ready?'<script src="'+assetURL('comments.js')+'" defer></script>':'')+'</body></html>';
   };
-  const groups=[...new Set(data.nodes.map(n=>subject(n.domain)))];
-  write('index.html',shell('Notes','<div class="home"><p class="intro">Working notes. Questions, attempts, and revisions.</p>'+(!data.nodes.length?'<p>No published notes yet.</p>':groups.map(group=>'<section><h2>'+esc(group)+'</h2><ul class="posts">'+data.nodes.filter(n=>subject(n.domain)===group).sort((a,b)=>a.title.localeCompare(b.title)).map(n=>'<li><a class="post-link" href="'+base+n.href+'">'+esc(n.title)+'</a><span class="post-domain">'+esc(domains[n.domain]||n.domain)+'</span></li>').join('')+'</ul></section>').join(''))+'</div>'));
-  for(const n of data.nodes){const examples=data.examples.filter(e=>e.parent===n.id);const body='<article class="post-content"><header class="post-header"><p class="eyebrow">'+esc(domains[n.domain]||n.domain)+' · Working draft</p><h1>'+esc(n.title)+'</h1></header>'+render(n)+(examples.length?'<section class="article-examples"><h2>Examples</h2><ul>'+examples.map(e=>'<li><a href="'+base+e.href+'">'+esc(e.title)+'</a></li>').join('')+'</ul></section>':'')+'</article>';
+  const groups=[...new Set(data.nodes.map(n=>n.subject))];
+  write('index.html',shell('Notes','<div class="home"><p class="intro">'+esc(intro)+'</p>'+(!data.nodes.length?'<p>No published notes yet.</p>':groups.map(group=>'<section><h2>'+esc(group)+'</h2><ul class="posts">'+data.nodes.filter(n=>n.subject===group).sort((a,b)=>a.title.localeCompare(b.title)).map(n=>'<li><a class="post-link" href="'+base+n.href+'">'+esc(n.title)+'</a><span class="post-domain">'+esc(n.domain)+'</span></li>').join('')+'</ul></section>').join(''))+'</div>'));
+  for(const n of data.nodes){const examples=data.examples.filter(e=>e.parent===n.id);const body='<article class="post-content"><header class="post-header"><p class="eyebrow">'+esc(n.domain)+' · Working draft</p><h1>'+esc(n.title)+'</h1></header>'+render(n)+(examples.length?'<section class="article-examples"><h2>Examples</h2><ul>'+examples.map(e=>'<li><a href="'+base+e.href+'">'+esc(e.title)+'</a></li>').join('')+'</ul></section>':'')+'</article>';
     write(n.href+'index.html',shell(n.title,body+commentsHTML(n,'node',commentSettings),{article:true}));}
   for(const e of data.examples){const parent=data.nodes.find(n=>n.id===e.parent);write(e.href+'index.html',shell(e.title,'<article class="post-content"><header class="post-header"><p class="eyebrow">Example · <a href="'+base+parent.href+'">'+esc(parent.title)+'</a></p><h1>'+esc(e.title)+'</h1></header>'+render(e)+'</article>'+commentsHTML(e,'example',commentSettings),{article:true}));}
-  const graph=graphData(data,base);write('atlas/graph.json',JSON.stringify(graph));
+  write(graphFile,JSON.stringify(graph));write('atlas/graph.json',JSON.stringify(graph));
   write('atlas/index.html',shell('Atlas','<section class="atlas"><div class="atlas-heading"><div><p class="eyebrow">A map of the published notes</p><h1>Atlas</h1></div><div class="map-actions"><a id="details-link" aria-disabled="true">Details</a><a href="'+base+'">Back</a></div></div><p id="selection-label" class="selection-label">Select a question or an example.</p><div id="map-host"><svg id="atlas-map" aria-label="Knowledge questions and their examples"></svg></div><p class="map-hint">Scroll to zoom · drag to pan · select, then Details</p></section>',{atlas:true}));
-  for(const name of ['main.css','app.js','comments.js','atlas-mark.svg'])write('assets/'+name,fs.readFileSync(path.join(sourceRoot,'web',name)));
+  for(const name of ['main.css','app.js','comments.js','atlas-mark.svg']){const bytes=fs.readFileSync(path.join(sourceRoot,'web',name));write('assets/'+name,bytes);if(name!=='atlas-mark.svg')write(assetURL(name).slice(base.length),bytes);}
   const katexDist=path.join(path.dirname(require.resolve('katex/package.json')),'dist');fs.cpSync(path.join(katexDist,'katex.min.css'),path.join(outDir,'assets/katex/katex.min.css'));fs.cpSync(path.join(katexDist,'fonts'),path.join(outDir,'assets/katex/fonts'),{recursive:true});
   write('assets/katex/LICENSE.txt',fs.readFileSync(path.join(path.dirname(katexDist),'LICENSE')));
   for(const [name,bytes]of assets)write('assets/images/'+name,bytes);
@@ -148,7 +130,7 @@ function build({vault,basePath='/qa/',title='telingc atlas',outDir,sourceRoot=pa
   // A public snapshot is a byte-for-byte artifact, including CRLF source files.
   write('.gitattributes','* -text\n');
   write('.nojekyll','');
-  const report={schemaVersion:2,articles:data.nodes.map(n=>({id:n.id,title:n.title,url:base+n.href})),examples:data.examples.map(e=>({id:e.id,parent:e.parent,title:e.title,url:base+e.href})),images:assets.size,sources:publicSources(sources),skippedSources:sources.skipped,sourceTarget:{repository:sources.repository,branch:sources.branch},comments:commentSettings,warnings:[...new Set(warnings)]};
+  const report={schemaVersion:3,graphVersion,articles:data.nodes.map(n=>({id:n.id,title:n.title,url:base+n.href})),examples:data.examples.map(e=>({id:e.id,parent:e.parent,title:e.title,url:base+e.href})),images:assets.size,sources:publicSources(sources),skippedSources:sources.skipped,sourceTarget:{repository:sources.repository,branch:sources.branch},comments:commentSettings,warnings:[...new Set(warnings)]};
   return report;
 }
-module.exports={build,snapshot,graphData,slug};
+module.exports={build,snapshot,graphData,slug,makeRenderer};

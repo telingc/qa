@@ -1,0 +1,11 @@
+{
+  "contentDir": "content",
+  "basePath": "/qa/",
+  "title": "telingc atlas",
+  "tagline": "A learning process, left open.",
+  "intro": "Working notes. Questions, attempts, and revisions.",
+  "blog": {"label": "telingc blog", "url": "https://telingc.github.io/"},
+  "github": {"repository": "telingc/qa", "branch": "main"},
+  "comments": {"enabled": true, "repository": "telingc/qa", "repoId": "R_kgDOVOXc8A", "category": "Announcements", "categoryId": "DIC_kwDOVOXc8M4DJOZ4"},
+  "deployment": {"mode": "actions"}
+}

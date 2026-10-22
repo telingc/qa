@@ -1,16 +1,17 @@
 {
-  "vault": "../life-project/knowledge-map/learning-vault",
+  "contentDir": "content",
   "basePath": "/qa/",
-  "title": "telingc atlas",
+  "title": "My atlas",
+  "tagline": "A learning process, left open.",
+  "blog": null,
   "github": {
-    "repository": "telingc/qa",
-    "branch": "gh-pages"
+    "repository": "",
+    "branch": "main"
   },
   "comments": {
-    "enabled": true,
-    "repository": "telingc/qa",
-    "repoId": "R_kgDOVOXc8A",
-    "category": "Announcements",
-    "categoryId": "DIC_kwDOVOXc8M4DJOZ4"
+    "enabled": false
+  },
+  "deployment": {
+    "mode": "actions"
   }
 }

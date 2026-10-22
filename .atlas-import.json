@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "files": {
+    "nodes/Basic Properties of Conductors.md": "b746bd25a27c78a27a3ea62731d3d66f5551900c6891dd2c06283bff4100cd6a",
+    "nodes/Boundary Conditions & Uniqueness Theorems.md": "6833e6522c0fb00218c8ba08edbb622efee41e2c73d602ece4d3f81a5e1fdc7f",
+    "nodes/Boundary Conditions.md": "1bcc596db20fef56b26bd94acefa4029bab096bbc72cddf25a049c74790e68c6",
+    "nodes/Coulomb's law & Electrostatic Fields.md": "9af8ca9ca6555f5da51385d9f6b71a27e95198b27b7bac95b77da1dc925df599",
+    "nodes/Curl of electrostatic fields.md": "95b1de52b1a2fed49fcfb62227859daed26e26d9ed2dc87975d7b902784bfa96",
+    "nodes/Divergence of Electrostatic Fields.md": "ac13a6fddff2b75808980698a955e0ec6cbb52af1fb272ea44335f58b1ffe376",
+    "nodes/Electric flux & Gauss' Law.md": "b46bca4c5f103cbc427d5c0a3ce0caaf154e7d87f637ae5773cd73c0efb65a6c",
+    "nodes/Electric potential.md": "5127daa25c1adfebdbe29cf05aba91c1203a1f5d5d80633ad5c0e8bc19315bed",
+    "nodes/Poisson's Equation & Laplace's Equation.md": "6adb6d74d98d0ce1b8587a841875e71ff866628166d6f41a0b78dcfbac34a2a7",
+    "nodes/Superposition of fields.md": "3fe96349af35c0c834b1a40ba45a9c9846aea2e250af5a891a1fecd63cf1e649",
+    "nodes/The Energy of Charge Distribution.md": "a39d2ef0a6730e9e85c9c2a7ce60aace9304832ac3c8c517cc1d54b50888fa26",
+    "examples/Charge from a Radial Field.md": "7ec3195fbe6ba82900586e3c6a94dc5a2ef957fe26830387f1214b4d57de287e",
+    "examples/Charged Ring & Charged Disk.md": "51696a9b97eba59f762018c9ff2df04e380212a6e57d16664933368910db696a",
+    "examples/Neutral Coaxial Cable.md": "30562ad4786f8bf78255d18619e31465822365789a61858f0449218054324f60",
+    "examples/Polygon Symmetry.md": "6a9e4166ff33337a15de970992930a4c0efda9fe221651404fad608bbc2c1baf",
+    "examples/Spherical Surface Using Gauss' Law.md": "b6f0914c930833ec51395a9c3caa067440747e865e7ca6cd1057cdac64c88c08",
+    "examples/Spherical Surface.md": "9ce9a110535c5eae4080fa9be5438abeaefeaa491c2ee4ce4adfa83afb611770",
+    "examples/Thick Spherical Shell.md": "9014da2da0b33d33733d7cca94b49a9d49e01490fe71e21467b540c89473c11c",
+    "images/b0f9f8e11a5c915dc390ed1d.png": "b0f9f8e11a5c915dc390ed1d1747edb7f0228d06db7715c059f3d9619876b203",
+    "images/1df374beaa9f7ca7e3fe4643.png": "1df374beaa9f7ca7e3fe4643cfa7ec591c911cebdd8200c560699a0a20e7a45d",
+    "images/5adac5b9db7437861d614a62.png": "5adac5b9db7437861d614a62650594c0c63a778740854156ea2668c05d2762a0",
+    "images/445f5f2066ca63f7b95ddc00.png": "445f5f2066ca63f7b95ddc00487ad9711497fa942d6874b507875870694f7d28",
+    "images/f943c7a98c773340d0a000b2.png": "f943c7a98c773340d0a000b2fb759b2d850f7ffbb0275ebca7f87d85e5c6dc03",
+    "images/55274064193e823b875bc8a2.png": "55274064193e823b875bc8a2be648a3c73e2b43fd5a41b76cfc581f5d5c560c3",
+    "images/a8cdd23694856c399ccf29ac.png": "a8cdd23694856c399ccf29ac51529d753dee80ae22b76792f982048463898413",
+    "images/156bc4c8f78ada7b452fc0a6.png": "156bc4c8f78ada7b452fc0a6910063222d4f5bfa8d1b9147aaccc4728c7e74b2",
+    "scripts/Nodes/boundary_conditions_and_uniqueness_theorem.py": "e172d1290df6dcfb42dc4ceef3d36ad6d027228e8f758d8cf14a2bef4d783512",
+    "scripts/Examples/radial_field_visualization.py": "c396420cac89935210f4d0d756a8a758ddfcec873bc26e1dd18a2388fcd2f955"
+  },
+  "relationships": {
+    "question-mv63diwx-u5jh": [
+      "coulomb-law",
+      "electric-potential",
+      "superposition"
+    ],
+    "question-mvangpxg-jthw": [
+      "question-mv8xnsjg-7y69",
+      "question-mv4vnu4t-aonx"
+    ],
+    "question-mv8xnsjg-7y69": [
+      "electric-flux"
+    ],
+    "coulomb-law": [],
+    "electrostatic-curl": [
+      "electric-flux",
+      "superposition"
+    ],
+    "electrostatic-divergence": [
+      "electric-flux"
+    ],
+    "electric-flux": [
+      "coulomb-law",
+      "superposition"
+    ],
+    "electric-potential": [
+      "electrostatic-curl"
+    ],
+    "question-mv4vnu4t-aonx": [
+      "electrostatic-curl",
+      "electrostatic-divergence"
+    ],
+    "superposition": [
+      "coulomb-law"
+    ],
+    "question-mv4vbia6-pmmj": [
+      "electric-potential"
+    ]
+  }
+}

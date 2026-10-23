@@ -14,8 +14,6 @@ Without a graph or something, we're exploring the dark with no torch. What does 
 #### 1) From Charge Density
 From above discussion we have the volume density $\displaystyle \rho(r)=5k\epsilon_0r^2$, then the integral$$\begin{align*}Q_{enc}&=\int_\mathcal B\rho\cdot d\,\tau\\&=\int_0^R\int_0^{2\pi}\int_0^{\pi}5k\epsilon_0r^2\cdot r^2\sin\theta\cdot d\theta\,d\phi\,dr\\&=4\pi\epsilon_0kR^5\end{align*}$$
 #### 2) From the Field Flux
-Using Gauss' law $\displaystyle \oint_{\partial \mathcal V}\mathbf E\cdot d\,\mathbf a=\frac{Q_{enc}}{\epsilon_0}$, we can calculate the total charge in the region:$$
-\begin{align*}Q_{enc}&=\epsilon_0\oint_\mathcal{\partial B}\mathbf{E}\cdot d\,\mathbf{a}\\&=\epsilon_0kR^3\oint_{\partial\mathcal{B}}dS\\&=4\pi\epsilon_0kR^5\end{align*}
-$$And its result is completely the same with the charge density approach we used above.
+Using Gauss' law $\displaystyle \oint_{\partial \mathcal V}\mathbf E\cdot d\,\mathbf a=\frac{Q_{enc}}{\epsilon_0}$, we can calculate the total charge in the region:$$\begin{align*}Q_{enc}&=\epsilon_0\oint_\mathcal{\partial B}\mathbf{E}\cdot d\,\mathbf{a}\\&=\epsilon_0kR^3\oint_{\partial\mathcal{B}}dS\\&=4\pi\epsilon_0kR^5\end{align*}$$And its result is completely the same with the charge density approach we used above.
 ## Source
 Griffiths, *Introduction to Electrodynamics*, 4th edition (2013), Problem 2.9, printed p. 70 (PDF p. 89). Faithful paraphrase of the original tasks; any extension is marked optional.

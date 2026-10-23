@@ -12,7 +12,8 @@
     "nodes/Poisson's Equation & Laplace's Equation.md": "6adb6d74d98d0ce1b8587a841875e71ff866628166d6f41a0b78dcfbac34a2a7",
     "nodes/Superposition of fields.md": "3fe96349af35c0c834b1a40ba45a9c9846aea2e250af5a891a1fecd63cf1e649",
     "nodes/The Energy of Charge Distribution.md": "a39d2ef0a6730e9e85c9c2a7ce60aace9304832ac3c8c517cc1d54b50888fa26",
-    "examples/Charge from a Radial Field.md": "7ec3195fbe6ba82900586e3c6a94dc5a2ef957fe26830387f1214b4d57de287e",
+    "examples/Admissible Field and Potential.md": "d47c7ed9199bbc9e4d00d8a9575ad2546e8415af8bb326a45e183515031a6a87",
+    "examples/Charge from a Radial Field.md": "b5e0e4e778ad147c39cec276e88dcd4e0bbf1e9702299ceb369407f747340bda",
     "examples/Charged Ring & Charged Disk.md": "51696a9b97eba59f762018c9ff2df04e380212a6e57d16664933368910db696a",
     "examples/Neutral Coaxial Cable.md": "30562ad4786f8bf78255d18619e31465822365789a61858f0449218054324f60",
     "examples/Polygon Symmetry.md": "6a9e4166ff33337a15de970992930a4c0efda9fe221651404fad608bbc2c1baf",
@@ -23,12 +24,16 @@
     "images/1df374beaa9f7ca7e3fe4643.png": "1df374beaa9f7ca7e3fe4643cfa7ec591c911cebdd8200c560699a0a20e7a45d",
     "images/5adac5b9db7437861d614a62.png": "5adac5b9db7437861d614a62650594c0c63a778740854156ea2668c05d2762a0",
     "images/445f5f2066ca63f7b95ddc00.png": "445f5f2066ca63f7b95ddc00487ad9711497fa942d6874b507875870694f7d28",
+    "images/3906df69003c01770e6588b9.png": "3906df69003c01770e6588b95899b0a9a9085082ead09eabafbec56b71a3260c",
+    "images/b3ccc632b2ddba938e7a9a32.png": "b3ccc632b2ddba938e7a9a3261d132158baba2b4a388c6f2264c4162f5c88b07",
     "images/f943c7a98c773340d0a000b2.png": "f943c7a98c773340d0a000b2fb759b2d850f7ffbb0275ebca7f87d85e5c6dc03",
     "images/55274064193e823b875bc8a2.png": "55274064193e823b875bc8a2be648a3c73e2b43fd5a41b76cfc581f5d5c560c3",
     "images/a8cdd23694856c399ccf29ac.png": "a8cdd23694856c399ccf29ac51529d753dee80ae22b76792f982048463898413",
     "images/156bc4c8f78ada7b452fc0a6.png": "156bc4c8f78ada7b452fc0a6910063222d4f5bfa8d1b9147aaccc4728c7e74b2",
     "scripts/Nodes/boundary_conditions_and_uniqueness_theorem.py": "e172d1290df6dcfb42dc4ceef3d36ad6d027228e8f758d8cf14a2bef4d783512",
-    "scripts/Examples/radial_field_visualization.py": "c396420cac89935210f4d0d756a8a758ddfcec873bc26e1dd18a2388fcd2f955"
+    "scripts/Examples/radial_field_visualization.py": "c396420cac89935210f4d0d756a8a758ddfcec873bc26e1dd18a2388fcd2f955",
+    "scripts/Examples/sphere_potential_heatmap.py": "4616b0b399592176900a445e6b0b5340ef07487beb173c5204f35140834da35f",
+    "scripts/Examples/vector_field_curl_visualization.py": "7b19da3a083617ae267a48c52cf1b70b7ad58fda05ed989ef6e3bae8a1fc60a9"
   },
   "relationships": {
     "question-mv63diwx-u5jh": [

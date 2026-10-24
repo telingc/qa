@@ -28,3 +28,28 @@ test('Empty content and missing graph work; duplicate IDs, broken parents and un
 test('Four example leaves stay separate; a fifth is rejected',()=>{
   const f=fixture();f.file('nodes/One.md',node('one'));for(let i=0;i<4;i++)f.file('examples/Case '+i+'.md',node('e'+i,'','parent: one\n'));const out=f.out();build({contentDir:f.content,outDir:out});const leaves=JSON.parse(fs.readFileSync(path.join(out,'atlas/graph.json'))).nodes.filter(n=>n.kind==='example');for(let i=0;i<leaves.length;i++)for(let j=i+1;j<leaves.length;j++)assert.ok(Math.abs(leaves[i].x-leaves[j].x)>=148||Math.abs(leaves[i].y-leaves[j].y)>=54);f.file('examples/Fifth.md',node('fifth','','parent: one\n'));assert.throws(()=>build({contentDir:f.content,outDir:f.out()}),/four examples/);
 });
+
+test('Display math protects equals lines and adjacent prose without consuming code examples',()=>{
+  const f=fixture(),body=String.raw`For $r>0$,
+$$
+I(r)
+=
+\begin{cases}2/r,& r<1,\\2,&r>1.\end{cases}
+$$
+The value at $r=0$ is understood by continuity.
+Therefore,$$
+\begin{aligned}V(r)&=r^2.\end{aligned}
+$$Substituting $r=1$ gives
+$$V(1)=1.$$
+
+Inline code: \`$$not math$$\`.
+
+\`\`\`text
+$$also not math$$
+\`\`\`
+
+Escaped delimiters: \$\$literal\$\$.
+`.replaceAll('\\`','`');
+  f.file('nodes/Mixed math.md',node('mixed',body));const out=f.out(),r=build({contentDir:f.content,outDir:out,basePath:'/custom/'}),text=html(out,r.articles[0]);
+  assert.deepEqual(r.warnings,[]);assert.doesNotMatch(text,/math-fallback/);assert.match(text,/The value at/);assert.match(text,/Substituting/);assert.match(text,/<code>\$\$not math\$\$<\/code>/);assert.match(text,/\$\$also not math\$\$/);assert.match(text,/\$\$literal\$\$/);assert.equal((text.match(/class="katex"/g)||[]).length,6);
+});

@@ -16,3 +16,19 @@ test('Unreferenced sources import with zero eligible notes; edits after preview 
   const f=fixture();for(let i=0;i<4;i++)f.note('Nodes/Node '+i+'.md',{atlas_id:'n'+i,atlas_status:0},'PRIVATE');f.file('Nodes/scripts/unlinked.py','original\r\n');applyImport(f.plan());assert.equal(fs.existsSync(path.join(f.content,'nodes')),false);assert.equal(fs.readFileSync(path.join(f.content,'scripts/Nodes/unlinked.py'),'utf8'),'original\r\n');
   f.file('Nodes/scripts/unlinked.py','new');const stale=f.plan();fs.writeFileSync(path.join(f.content,'scripts/Nodes/unlinked.py'),'LOCAL AFTER PREVIEW');assert.throws(()=>applyImport(stale),/changed during import/);assert.equal(fs.readFileSync(path.join(f.content,'scripts/Nodes/unlinked.py'),'utf8'),'LOCAL AFTER PREVIEW');
 });
+
+test('Broken source links stop import with an actionable file-specific message; exact links import four third-stage examples',()=>{
+  const f=fixture(),body='A reference [script](scripts/potential) and $$V=r^2$$.';
+  f.file('Examples/scripts/potential.py','value = 1\r\n');
+  for(let i=0;i<4;i++)f.note('Examples/Potential '+i+'.md',{atlas_example_id:'potential'+i,atlas_node_id:'n2'},i===0?body:'Worked example '+i);
+  fs.unlinkSync(path.join(f.vault,'Knowledge Atlas/Examples/Example 2.md'));
+  assert.throws(()=>f.plan(),/Source link unavailable in Potential 0.md: scripts\/potential.*including its extension/);assert.equal(fs.existsSync(f.content),false);assert.equal(fs.existsSync(f.stateFile),false);
+  const original=f.note('Examples/Potential 0.md',{atlas_example_id:'potential0',atlas_node_id:'n2'},body.replace('(scripts/potential)','(scripts/potential.py)')),bytes=fs.readFileSync(original),plan=f.plan();
+  assert.equal(plan.report.examples,5);applyImport(plan);const {snapshot}=require('../src/content.cjs'),data=snapshot(f.content);
+  assert.equal(data.examples.filter(e=>e.parent==='n2').length,4);assert.match(fs.readFileSync(path.join(f.content,'examples/Potential 0.md'),'utf8'),/scripts\/Examples\/potential.py/);assert.deepEqual(fs.readFileSync(original),bytes);assert.deepEqual(f.plan().report.changes,{added:[],modified:[],removed:[]});
+});
+
+test('Invalid TeX identifies its note and leaves original records intact',()=>{
+  const f=fixture();applyImport(f.plan());const previous=fs.readFileSync(f.stateFile),content=fs.readFileSync(path.join(f.content,'nodes/Node 2.md'));f.note('Nodes/Node 2.md',{atlas_id:'n2',atlas_status:2},String.raw`$$\unknownCommand{x}$$`);
+  assert.throws(()=>f.plan(),/Formula retained as TeX in Node 2.md: KaTeX parse error/);assert.deepEqual(fs.readFileSync(f.stateFile),previous);assert.deepEqual(fs.readFileSync(path.join(f.content,'nodes/Node 2.md')),content);
+});

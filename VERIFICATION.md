@@ -1,3 +1,17 @@
+# Potential examples import — 2026-10-24
+
+The import threshold is unchanged: UI stage 2 (Can explain, stored 1) includes node articles; UI stage 3 (Reproduce unaided, stored 2) includes their examples. Electric potential is stored at 2 and all four examples are eligible.
+
+The source note's sphere_potential_heatmap link was corrected to include .py, with the original note backed up. No extension guessing was added. Broken script links now identify the file and request an exact path with its extension; invalid TeX reports the source note and KaTeX error. Failed imports still preserve existing content and import state.
+
+Display math is parsed before Markdown setext headings, including prose adjacent to $$ delimiters. This prevents an isolated equals sign inside valid TeX from splitting the block. Original formulas and worked solutions are unchanged; inline/fenced code and escaped delimiters remain literal.
+
+Validation: all 14 tests pass. The real import produces 11 node articles, 12 examples, 13 images and 5 source files with no warnings. All four Potential examples passed browser checks at 1280/390/320px, with no math fallbacks or page-wide overflow. The sphere plot loads after scrolling and its script link points to the exact .py file. Evidence is under E:/workspace/life-project/output/qa-potential-import-20261024/. These are local checks; this fix has not been deployed remotely.
+
+Windows refused to rename the existing content directory (EPERM), although an adjacent empty-directory probe could be renamed. This update contained eight additions and no modified/deleted content. A one-time helper made a complete content/state backup, created only those eight files without overwrite, re-read the four examples, and updated the checked import state. A subsequent normal preview reports no changes. The regular import transaction was not replaced with a fallback; if Windows holds the directory again, close applications using content before retrying.
+
+---
+
 # QA 0.3.0 — standalone Markdown content
 
 Date: 2026-10-22, Asia/Shanghai.

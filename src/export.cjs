@@ -39,7 +39,7 @@ function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
     if(note){onReference({from,raw,kind:'note',file});return base+note.href+(raw.includes('#')?'#'+encodeURIComponent(raw.split('#').slice(1).join('#')):'');
     }
     onReference({from,raw,kind:'unpublished'});
-    if(/(?:^|\/)scripts\//.test(raw))warnings.push('Source link unavailable in '+path.basename(from)+': '+raw);
+    if(/(?:^|\/)scripts\//.test(raw))warnings.push('Source link unavailable in '+path.basename(from)+': '+raw+'. Use an exact file path including its extension (for example, .py).');
     // Ordinary links to area notes or private nodes remain plain text. They do not create prerequisites.
     return null;
   };
@@ -51,15 +51,30 @@ function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
     if(!silent){const token=state.push('atlas_math','',0);token.content=state.src.slice(start+delimiter.length,end);token.block=delimiter==='$$';}
     state.pos=end+delimiter.length;return true;
   });
-  md.block.ruler.before('fence','atlas_math_block',(state,start,end,silent)=>{
-    const first=state.bMarks[start]+state.tShift[start],text=state.src.slice(first,state.eMarks[start]);if(!text.startsWith('$$'))return false;
-    let close=state.src.indexOf('$$',first+2);if(close<0)return false;if(silent)return true;
-    const token=state.push('atlas_math','',0);token.content=state.src.slice(first+2,close);token.block=true;
+  const displayStart=text=>{
+    for(let i=0;i<text.length;){
+      if(text[i]==='\\'){i+=2;continue;}
+      if(text[i]==='`'){const run=text.slice(i).match(/^`+/)[0],close=text.indexOf(run,i+run.length);i=close<0?i+run.length:close+run.length;continue;}
+      if(text.startsWith('$$',i))return i;
+      i++;
+    }
+    return -1;
+  };
+  // Protect display math before Markdown interprets an '=' line as a heading.
+  // Obsidian also permits prose immediately before/after the $$ delimiters.
+  md.block.ruler.before('lheading','atlas_math_block',(state,start,end,silent)=>{
+    const first=state.bMarks[start]+state.tShift[start],text=state.src.slice(first,state.eMarks[start]),offset=displayStart(text);if(offset<0)return false;
+    const opening=first+offset;let close=opening+2;
+    while((close=state.src.indexOf('$$',close))>=0){let slashes=0;for(let p=close-1;p>=0&&state.src[p]==='\\';p--)slashes++;if(!(slashes%2))break;close+=2;}
+    if(close<0||close+2>state.eMarks[end-1])return false;if(silent)return true;
+    const prose=content=>{if(content.trim()){state.push('paragraph_open','p',1);const t=state.push('inline','',0);t.content=content.trim();t.children=[];state.push('paragraph_close','p',-1);}};
+    prose(state.src.slice(first,opening));
+    const token=state.push('atlas_math','',0);token.content=state.src.slice(opening+2,close);token.block=true;
     let line=start;while(line<end&&state.eMarks[line]<close+2)line++;state.line=line+1;
-    const tail=state.src.slice(close+2,state.eMarks[line]).trim();if(tail){const p=state.push('paragraph_open','p',1),t=state.push('inline','',0);t.content=tail;t.children=[];state.push('paragraph_close','p',-1);}
+    prose(state.src.slice(close+2,state.eMarks[line]));
     return true;
-  });
-  md.renderer.rules.atlas_math=(tokens,index)=>{const t=tokens[index];let html;try{html=katex.renderToString(t.content,{displayMode:t.block,throwOnError:true,trust:false,strict:'ignore',maxExpand:1000});}catch{warnings.push('Formula retained as TeX');html='<code class="math-fallback">'+esc(t.content)+'</code>';}
+  },{alt:['paragraph']});
+  md.renderer.rules.atlas_math=(tokens,index,options,env)=>{const t=tokens[index];let html;try{html=katex.renderToString(t.content,{displayMode:t.block,throwOnError:true,trust:false,strict:'ignore',maxExpand:1000});}catch(error){warnings.push('Formula retained as TeX in '+path.basename(env.file)+': '+error.message);html='<code class="math-fallback">'+esc(t.content)+'</code>';}
     return t.block?'<div class="formula">'+html+'</div>':'<span class="inline-formula">'+html+'</span>';};
   md.inline.ruler.before('image','atlas_wiki',(state,silent)=>{
     const match=state.src.slice(state.pos).match(/^(!?)\[\[([^\]\n]+)\]\]/);if(!match)return false;

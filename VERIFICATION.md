@@ -1,3 +1,10 @@
+# Preview port reuse — 2026-10-25
+
+The build succeeded, but a previous QA preview still owned port 5190. Preview QA now opens the browser only after startup or successful reuse. Repeated launches reuse a matching checkout and base path, identified by a local response header. A different checkout or unrelated service is left running and receives a clear port-conflict message instead of an unhandled Node error. The browser URL respects PORT and basePath.
+
+Validation: all 19 automated tests pass. New lifecycle checks cover repeated launch, later build files served without restarting, a custom port/base path, rejection of a different checkout and preservation of an unrelated service. The real daily preview at http://127.0.0.1:5190/qa/ returned HTTP 200, includes Capacitors, and a second npm start exited successfully with a reuse message. README, Capacitors, graph and import state retained their original SHA256 values. These are local server/HTTP checks; default-browser opening was not visually verified. No remote publication was performed.
+
+---
 # Method of Images import — 2026-10-25
 
 Method of Images is at UI stage 2 (stored atlas_status 1), so it is eligible as a node article. Import was stopped by an unsupported SVG image and a home-relative script link, leaving the previous content/preview intact.

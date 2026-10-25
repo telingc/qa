@@ -4,6 +4,7 @@
     "nodes/Basic Properties of Conductors.md": "b746bd25a27c78a27a3ea62731d3d66f5551900c6891dd2c06283bff4100cd6a",
     "nodes/Boundary Conditions & Uniqueness Theorems.md": "6833e6522c0fb00218c8ba08edbb622efee41e2c73d602ece4d3f81a5e1fdc7f",
     "nodes/Boundary Conditions.md": "1bcc596db20fef56b26bd94acefa4029bab096bbc72cddf25a049c74790e68c6",
+    "nodes/Capacitors.md": "6cbef32a59de8919e77da58443ec4c01366ce6edf2a34442756efd2b3878bf17",
     "nodes/Coulomb's law & Electrostatic Fields.md": "9af8ca9ca6555f5da51385d9f6b71a27e95198b27b7bac95b77da1dc925df599",
     "nodes/Curl of electrostatic fields.md": "95b1de52b1a2fed49fcfb62227859daed26e26d9ed2dc87975d7b902784bfa96",
     "nodes/Divergence of Electrostatic Fields.md": "ac13a6fddff2b75808980698a955e0ec6cbb52af1fb272ea44335f58b1ffe376",
@@ -64,6 +65,11 @@
     ],
     "question-mv8xnsjg-7y69": [
       "electric-flux"
+    ],
+    "question-mv7mg6l2-g2pf": [
+      "question-mv63diwx-u5jh",
+      "question-mv8xnsjg-7y69",
+      "electric-potential"
     ],
     "coulomb-law": [],
     "electrostatic-curl": [

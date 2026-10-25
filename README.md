@@ -30,7 +30,7 @@ Even “wait, why?” is useful. Thanks 😊!
 
 **Q: Can I use this?**
 
-A: As you like!
+A: As you like! And I'll try to make this repo easier for you to deploy as much as I can.
 
 **Q: Wait, This sounds really dumb.**
 

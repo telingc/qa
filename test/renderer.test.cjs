@@ -53,3 +53,9 @@ Escaped delimiters: \$\$literal\$\$.
   f.file('nodes/Mixed math.md',node('mixed',body));const out=f.out(),r=build({contentDir:f.content,outDir:out,basePath:'/custom/'}),text=html(out,r.articles[0]);
   assert.deepEqual(r.warnings,[]);assert.doesNotMatch(text,/math-fallback/);assert.match(text,/The value at/);assert.match(text,/Substituting/);assert.match(text,/<code>\$\$not math\$\$<\/code>/);assert.match(text,/\$\$also not math\$\$/);assert.match(text,/\$\$literal\$\$/);assert.equal((text.match(/class="katex"/g)||[]).length,6);
 });
+
+test('SVG diagrams are copied unchanged and referenced as images rather than inserted into article HTML',()=>{
+  const f=fixture(),svg='<svg xmlns="http://www.w3.org/2000/svg" width="100" height="50"><style>text{fill:navy}</style><text x="5" y="25">Learning route</text></svg>';
+  f.file('images/route.svg',svg);f.file('nodes/Route.md',node('route','![[route.svg]]\n\n![diagram](../images/route.svg)\n\n<img src="../images/route.svg" alt="diagram">'));
+  const out=f.out(),report=build({contentDir:f.content,outDir:out,basePath:'/custom/'}),text=html(out,report.articles[0]);assert.deepEqual(report.warnings,[]);assert.equal(report.images,1);assert.equal((text.match(/<img src="\/custom\/assets\/images\/[a-f0-9]+\.svg"/g)||[]).length,3);assert.doesNotMatch(text,/<svg|Learning route/);const exported=fs.readdirSync(path.join(out,'assets/images')).find(name=>name.endsWith('.svg'));assert.equal(fs.readFileSync(path.join(out,'assets/images',exported),'utf8'),svg);
+});

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="930" viewBox="0 0 950 930" role="img" aria-labelledby="title description">
+  <title id="title">Path to the Hankel Transform</title>
+  <desc id="description">A suggested learning route from multivariable calculus through complex exponentials, improper and parameter integrals, Fourier transforms, convolution, two-dimensional Fourier transforms, and Bessel functions to the Hankel transform and its application to induced charge. Dashed branches show optional convergence theory, regularization, and distributions.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 9 4.5 L 0 9 Z" fill="#668296"/>
+    </marker>
+    <marker id="optional-arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 9 4.5 L 0 9 Z" fill="#ae9470"/>
+    </marker>
+    <style>
+      text { font-family: 'Segoe UI', Arial, sans-serif; fill: #263e53; }
+      .node { fill: #f0f5f8; stroke: #668296; stroke-width: 1.5; }
+      .optional-node { fill: #faf7f0; stroke: #ae9470; stroke-width: 1.5; stroke-dasharray: 5 4; }
+      .label { font-size: 18px; text-anchor: middle; }
+      .optional-label { font-size: 17px; text-anchor: middle; fill: #715d41; }
+      .edge { fill: none; stroke: #668296; stroke-width: 1.7; stroke-linejoin: round; }
+      .optional-edge { fill: none; stroke: #ae9470; stroke-width: 1.6; stroke-dasharray: 5 5; stroke-linejoin: round; }
+    </style>
+  </defs>
+  <rect width="950" height="930" rx="16" fill="#ffffff"/>
+  <text x="475" y="40" text-anchor="middle" font-size="26" font-weight="600">Path to the Hankel Transform</text>
+
+  <g class="edge">
+    <path d="M 460 138 V 158 H 310 V 180" marker-end="url(#arrow)"/>
+    <path d="M 460 158 H 595 V 180" marker-end="url(#arrow)"/>
+    <path d="M 310 238 V 258 H 460"/>
+    <path d="M 595 238 V 258 H 460 V 280" marker-end="url(#arrow)"/>
+    <path d="M 460 338 V 380" marker-end="url(#arrow)"/>
+    <path d="M 460 438 V 480" marker-end="url(#arrow)"/>
+    <path d="M 460 538 V 580" marker-end="url(#arrow)"/>
+    <path d="M 460 638 V 680" marker-end="url(#arrow)"/>
+    <path d="M 460 738 V 780" marker-end="url(#arrow)"/>
+  </g>
+  <g class="optional-edge">
+    <path d="M 720 209 H 805 V 380" marker-end="url(#optional-arrow)"/>
+    <path d="M 805 438 V 680" marker-end="url(#optional-arrow)"/>
+    <path d="M 590 709 H 700" marker-end="url(#optional-arrow)"/>
+  </g>
+
+  <g>
+    <rect class="node" x="330" y="80" width="260" height="58" rx="9"/>
+    <text class="label" x="460" y="116">Multivariable Calculus</text>
+
+    <rect class="node" x="190" y="180" width="240" height="58" rx="9"/>
+    <text class="label" x="310" y="216">Complex Exponentials</text>
+
+    <rect class="node" x="470" y="180" width="250" height="58" rx="9"/>
+    <text class="label" x="595" y="203"><tspan x="595">Improper &amp;</tspan><tspan x="595" dy="22">Parameter Integrals</tspan></text>
+
+    <rect class="node" x="330" y="280" width="260" height="58" rx="9"/>
+    <text class="label" x="460" y="316">Fourier Transform</text>
+
+    <rect class="node" x="330" y="380" width="260" height="58" rx="9"/>
+    <text class="label" x="460" y="416">Convolution</text>
+
+    <rect class="node" x="330" y="480" width="260" height="58" rx="9"/>
+    <text class="label" x="460" y="516">2D Fourier Transform</text>
+
+    <rect class="node" x="330" y="580" width="260" height="58" rx="9"/>
+    <text class="label" x="460" y="616">Bessel Function J₀</text>
+
+    <rect class="node" x="330" y="680" width="260" height="58" rx="9"/>
+    <text class="label" x="460" y="716">Hankel Transform</text>
+
+    <rect class="node" x="330" y="780" width="260" height="58" rx="9"/>
+    <text class="label" x="460" y="816">Induced Charge</text>
+
+    <rect class="optional-node" x="700" y="380" width="210" height="58" rx="9"/>
+    <text class="optional-label" x="805" y="416">Convergence Theory</text>
+
+    <rect class="optional-node" x="700" y="680" width="210" height="58" rx="9"/>
+    <text class="optional-label" x="805" y="703"><tspan x="805">Regularization</tspan><tspan x="805" dy="22">&amp; Distributions</tspan></text>
+  </g>
+
+  <path class="edge" d="M 235 892 H 280" marker-end="url(#arrow)"/>
+  <text x="291" y="898" font-size="14">Core route</text>
+  <path class="optional-edge" d="M 510 892 H 555" marker-end="url(#optional-arrow)"/>
+  <text x="566" y="898" font-size="14" style="fill:#715d41">Optional theory</text>
+</svg>

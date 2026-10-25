@@ -32,3 +32,16 @@ test('Invalid TeX identifies its note and leaves original records intact',()=>{
   const f=fixture();applyImport(f.plan());const previous=fs.readFileSync(f.stateFile),content=fs.readFileSync(path.join(f.content,'nodes/Node 2.md'));f.note('Nodes/Node 2.md',{atlas_id:'n2',atlas_status:2},String.raw`$$\unknownCommand{x}$$`);
   assert.throws(()=>f.plan(),/Formula retained as TeX in Node 2.md: KaTeX parse error/);assert.deepEqual(fs.readFileSync(f.stateFile),previous);assert.deepEqual(fs.readFileSync(path.join(f.content,'nodes/Node 2.md')),content);
 });
+
+test('SVG images survive stage-two import and re-reading; a bad source link still blocks the entire update',()=>{
+  const f=fixture(),svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50"><style>text{fill:navy}</style><text x="5" y="25">Hankel route</text></svg>',body='![[route.svg]]\n\n[route](images/route.svg)\n\n![diagram](images/route.svg)\n\n[heatmap](~/scripts/heatmap.py)';
+  f.note('Nodes/Images.md',{atlas_id:'images',atlas_status:1},body);f.file('Nodes/images/route.svg',svg);f.file('Nodes/scripts/heatmap.py','print("plot")\r\n');
+  assert.throws(()=>f.plan(),/Local link unavailable in Images.md: ~\/scripts\/heatmap.py.*Home-relative paths/);assert.equal(fs.existsSync(f.content),false);
+  const note=f.note('Nodes/Images.md',{atlas_id:'images',atlas_status:1},body.replace('~/scripts/','scripts/')),before=fs.readFileSync(note);const plan=f.plan();applyImport(plan);
+  const images=fs.readdirSync(path.join(f.content,'images')).filter(name=>name.endsWith('.svg'));assert.equal(images.length,1);assert.equal(fs.readFileSync(path.join(f.content,'images',images[0]),'utf8'),svg);assert.deepEqual(fs.readFileSync(note),before);
+  const imported=fs.readFileSync(path.join(f.content,'nodes/Images.md'),'utf8');assert.match(imported,/!\[route.svg\]\(\.\.\/images\/[a-f0-9]+\.svg\)/);assert.match(imported,/!\[diagram\]\(\.\.\/images\/[a-f0-9]+\.svg\)/);assert.doesNotMatch(imported,/~\/scripts/);assert.deepEqual(f.plan().report.changes,{added:[],modified:[],removed:[]});
+});
+
+test('Adding a node between existing titles does not report a graph change on the next import',()=>{
+  const f=fixture();applyImport(f.plan());f.note('Nodes/Node 1.5.md',{atlas_id:'inserted',atlas_status:1},'New node.');f.file('graph.json',JSON.stringify({version:1,prerequisites:{n1:['n0'],inserted:['n1'],n2:['n1'],n3:['n2']}}));const plan=f.plan();assert.ok(plan.report.changes.added.includes('nodes/Node 1.5.md'));applyImport(plan);assert.deepEqual(f.plan().report.changes,{added:[],modified:[],removed:[]});
+});

@@ -15,6 +15,7 @@ function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
   const vaultFiles=listFiles(data.vault);
   const resolve=(raw,from)=>{
     let filePart;try{filePart=decodeURIComponent(raw.split('#')[0]);}catch{return null;}
+    if(/^~[\\/]/.test(filePart))return null;
     if(!filePart)return from;
     const candidates=[path.resolve(path.dirname(from),filePart),path.resolve(data.vault,filePart)];
     if(!path.extname(filePart))candidates.push(...candidates.map(p=>p+'.md'));
@@ -27,7 +28,7 @@ function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
   };
   const localImage=(raw,from)=>{
     if(/^https?:\/\//i.test(raw)){warnings.push('External image omitted in '+path.basename(from));return null;}
-    const file=resolve(raw,from);if(!file||!file.startsWith(data.vault+path.sep)||! /\.(png|jpe?g|gif|webp|avif)$/i.test(file)){warnings.push('Image unavailable in '+path.basename(from)+': '+raw);return null;}
+    const file=resolve(raw,from);if(!file||!file.startsWith(data.vault+path.sep)||! /\.(png|jpe?g|gif|webp|avif|svg)$/i.test(file)){warnings.push('Image unavailable in '+path.basename(from)+': '+raw);return null;}
     const bytes=fs.readFileSync(file),name=hash(bytes).slice(0,24)+path.extname(file).toLowerCase();assets.set(name,bytes);onReference({from,raw,kind:'image',name,file});return base+'assets/images/'+name;
   };
   const localLink=(raw,from)=>{
@@ -39,7 +40,8 @@ function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
     if(note){onReference({from,raw,kind:'note',file});return base+note.href+(raw.includes('#')?'#'+encodeURIComponent(raw.split('#').slice(1).join('#')):'');
     }
     onReference({from,raw,kind:'unpublished'});
-    if(/(?:^|\/)scripts\//.test(raw))warnings.push('Source link unavailable in '+path.basename(from)+': '+raw+'. Use an exact file path including its extension (for example, .py).');
+    if(/^~[\\/]/.test(raw))warnings.push('Local link unavailable in '+path.basename(from)+': '+raw+'. Home-relative paths (~/) are not supported. Use a path relative to this note, for example '+raw.slice(2)+'.');
+    else if(/(?:^|\/)scripts\//.test(raw))warnings.push('Source link unavailable in '+path.basename(from)+': '+raw+'. Use an exact file path including its extension (for example, .py).');
     // Ordinary links to area notes or private nodes remain plain text. They do not create prerequisites.
     return null;
   };

@@ -17,4 +17,9 @@ try{
   if(plan.report.conflicts.length)throw Error('Resolve import conflicts before applying:\n'+plan.report.conflicts.join('\n'));
   if(args.includes('--confirm')){if(approved!==plan.report.planHash)throw Error('Import changed or was not reviewed. Review the new import-review.json first.');applyImport(plan);console.log('Local content updated. No source-vault or remote changes.');}
   else console.log('No content changes. Review import-review.json and repeat with --confirm to apply locally.');
-}catch(error){console.error(error.message);process.exitCode=1;}
+}catch(error){
+  console.error('Import stopped: '+error.message+'\nFix the reported issue and run Import Atlas again. Preview QA only shows content from successful imports.');
+  try{fs.appendFileSync(path.join(root,'import-error.log'),'['+new Date().toISOString()+'] '+(error.stack||error.message)+'\n\n','utf8');console.error('Details saved to import-error.log.');}
+  catch(logError){console.error('Could not write import-error.log: '+logError.message);}
+  process.exitCode=1;
+}

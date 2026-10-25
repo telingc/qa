@@ -73,6 +73,7 @@ function prepareImport({vault,contentDir,stateFile}){
     if(current!==undefined&&JSON.stringify(current)!==JSON.stringify(next)&&JSON.stringify(current)!==JSON.stringify(old))conflicts.push('Relationship '+id+' has local edits');
     delete graph.prerequisites[id];if(next!==undefined)graph.prerequisites[id]=next;
   }
+  graph.prerequisites=Object.fromEntries(Object.entries(graph.prerequisites).sort(([a],[b])=>a<b?-1:a>b?1:0));
   const graphBytes=Buffer.from(JSON.stringify(graph,null,2)+'\n'),graphPath=path.join(content,'graph.json');
   if(!fs.existsSync(graphPath)||!fs.readFileSync(graphPath).equals(graphBytes))changes[fs.existsSync(graphPath)?'modified':'added'].push('graph.json');
   const nextState={version:1,files:Object.fromEntries([...files].map(([name,bytes])=>[name,hash(bytes)])),relationships};

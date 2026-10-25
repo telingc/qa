@@ -1,3 +1,17 @@
+# Method of Images import — 2026-10-25
+
+Method of Images is at UI stage 2 (stored atlas_status 1), so it is eligible as a node article. Import was stopped by an unsupported SVG image and a home-relative script link, leaving the previous content/preview intact.
+
+Local SVG diagrams now use the same hashed image assets as PNG/JPEG and are referenced through img elements. SVG bytes are retained, not inserted into article HTML. Paths starting with ~/ are explicitly rejected even when basename lookup could find a similarly named file. Errors identify the note, original link and suggested relative path; the import CLI appends timestamped diagnostic details to ignored import-error.log and explains that Preview shows successful imports only.
+
+Only the ~/ prefix was removed from three verified script links (Method of Images, Charge from a Radial Field and Infinite-line Reference). Original notes were backed up; no equations, prose, learning stages or history were edited. Source scripts remain byte-for-byte copies. The source's case-only rename to Superposition of Fields retains its ID and examples.
+
+Graph relationship keys are serialized in stable ID order. Adding a node between existing titles no longer causes an order-only graph.json modification on the next import; relationship values are retained.
+
+Validation: 17 automated tests pass, including SVG import/re-read/idempotence, unchanged image bytes, rejection of ~/ links and graph stability after adding a node. The real snapshot builds 12 node articles, 12 examples, 17 images and 9 source files with no warnings. The Method of Images page passed at 1280/390/320px: its SVG loads, 21 formulas render, no TeX fallbacks and no page-wide overflow. Local evidence and original-file backups are under E:/workspace/life-project/output/qa-method-images-20261025/. Hosted deployment is a separate step.
+
+---
+
 # Potential examples import — 2026-10-24
 
 The import threshold is unchanged: UI stage 2 (Can explain, stored 1) includes node articles; UI stage 3 (Reproduce unaided, stored 2) includes their examples. Electric potential is stored at 2 and all four examples are eligible.

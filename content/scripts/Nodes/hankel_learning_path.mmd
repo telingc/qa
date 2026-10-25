@@ -1,0 +1,18 @@
+flowchart TD
+    A[Multivariable Calculus] --> B[Complex Exponentials]
+    A --> C[Improper & Parameter Integrals]
+    B --> D[Fourier Transform]
+    C --> D
+    D --> E[Convolution]
+    E --> F[2D Fourier Transform]
+    F --> G[Bessel Function J₀]
+    G --> H[Hankel Transform]
+    H --> I[Induced Charge]
+    C -.-> J[Convergence Theory]
+    J -.-> K[Regularization & Distributions]
+    H -.-> K
+
+    classDef core fill:#f0f5f8,stroke:#668296,color:#263e53;
+    classDef optional fill:#faf7f0,stroke:#ae9470,color:#715d41,stroke-dasharray:5 4;
+    class A,B,C,D,E,F,G,H,I core;
+    class J,K optional;

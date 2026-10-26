@@ -1,3 +1,12 @@
+# Obsidian callouts — 2026-10-26
+
+QA now renders quote-prefixed [!note] callouts, built-in type aliases, custom titles, nested blocks and native details/summary folding. A minus or plus immediately after ] selects initially closed or open folding; a spaced minus remains title text. Unknown types use the Note style. Title and body content retain the shared Markdown, public-link and HTML-sanitization pipeline. No dependency or browser-side script was added, and ordinary blockquotes and literal code remain unchanged.
+
+Quoted display math now uses Markdown's dequoted lines instead of passing the raw > prefixes into KaTeX. Small inline-formula padding within callouts accommodates glyph overhang without spurious scrollbars.
+
+Validation: all 21 tests pass, covering nested callouts, node/example pages, aliases, defaults, title-only notes, inline titles/links, exact multi-line TeX, images, tables, code fences and HTML sanitization. Actual content builds 14 node articles, 12 examples, 17 images and 9 sources with no warnings. The real Separation of Variables callout starts collapsed and passed mouse, Enter and Space toggling in the Codex in-app browser. Desktop and 390/320px viewport checks show no page-wide overflow or math fallbacks; long math scrolls within its region. All content SHA256 values remain unchanged. This is local browser verification, not physical mobile or hosted deployment verification. Evidence: E:/workspace/life-project/output/qa-callouts-20261026/.
+
+---
 # Preview port reuse — 2026-10-25
 
 The build succeeded, but a previous QA preview still owned port 5190. Preview QA now opens the browser only after startup or successful reuse. Repeated launches reuse a matching checkout and base path, identified by a local response header. A different checkout or unrelated service is left running and receives a clear port-conflict message instead of an unhandled Node error. The browser URL respects PORT and basePath.

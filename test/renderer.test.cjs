@@ -59,3 +59,45 @@ test('SVG diagrams are copied unchanged and referenced as images rather than ins
   f.file('images/route.svg',svg);f.file('nodes/Route.md',node('route','![[route.svg]]\n\n![diagram](../images/route.svg)\n\n<img src="../images/route.svg" alt="diagram">'));
   const out=f.out(),report=build({contentDir:f.content,outDir:out,basePath:'/custom/'}),text=html(out,report.articles[0]);assert.deepEqual(report.warnings,[]);assert.equal(report.images,1);assert.equal((text.match(/<img src="\/custom\/assets\/images\/[a-f0-9]+\.svg"/g)||[]).length,3);assert.doesNotMatch(text,/<svg|Learning route/);const exported=fs.readdirSync(path.join(out,'assets/images')).find(name=>name.endsWith('.svg'));assert.equal(fs.readFileSync(path.join(out,'assets/images',exported),'utf8'),svg);
 });
+
+test('Callouts retain nested Markdown, links, images and exact quoted TeX in node and example articles',()=>{
+  const f=fixture(),tex=String.raw`\frac{1}{r^2}
+= \lambda`,body=[
+    '> [!note]- Angular **separation** and [related note](Related.md)',
+    '> Immediate body with $r>0$.',
+    '> $$',...tex.split('\n').map(line=>'> '+line),'> $$',
+    '> After the equation.', '>',
+    '> > [!TIP]+ Check the boundary', '> > - First step', '> > - **Second step**', '>',
+    '> ![plot](../images/plot.svg)', '>',
+    '> | A | B |','> |---|---|','> | 1 | 2 |','>',
+    '> ```text','> > [!warning] literal code','> ```'
+  ].join('\n');
+  f.file('nodes/Related.md',node('related'));const noteFile=f.file('nodes/Callout.md',node('callout',body)),before=fs.readFileSync(noteFile);
+  f.file('images/plot.svg','<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40"><circle cx="20" cy="20" r="10"/></svg>');
+  f.file('examples/Example.md',node('example','> [!warning]\n> Check $x<2$ before proceeding.','parent: callout\n'));
+  const out=f.out(),report=build({contentDir:f.content,outDir:out,basePath:'/custom/'}),text=html(out,report.articles.find(n=>n.id==='callout'));
+  assert.deepEqual(report.warnings,[]);assert.deepEqual(fs.readFileSync(noteFile),before);
+  assert.match(text,/<details class="callout callout-note">/);assert.match(text,/<summary class="callout-title">Angular <strong>separation<\/strong> and <a href="\/custom\/articles\//);
+  assert.match(text,/<details class="callout callout-tip" open="">/);assert.match(text,/<li><strong>Second step<\/strong><\/li>/);assert.match(text,/Immediate body/);assert.match(text,/After the equation/);
+  const annotation=[...text.matchAll(/<annotation encoding="application\/x-tex">([\s\S]*?)<\/annotation>/g)].map(match=>match[1]);
+  assert.ok(annotation.some(source=>source.trim()===tex));assert.match(text,/class="table-scroll"/);assert.match(text,/assets\/images\/[a-f0-9]+\.svg/);
+  assert.match(text,/&gt; \[!warning\] literal code/);assert.equal((text.match(/<details class="callout/g)||[]).length,2);
+  assert.match(html(out,report.examples[0]),/<aside class="callout callout-warning">[\s\S]*<div class="callout-title">Warning<\/div>/);
+});
+
+test('Callout defaults, aliases and custom titles preserve ordinary quotes and literal syntax safely',()=>{
+  const f=fixture(),body=[
+    '> [!note]', '', '> [!note] -', '', '> [!unknown-type] Custom **title**', '> Body.', '',
+    '> [!faq]- A question', '> Answer.', '', '> Ordinary **quote**.', '',
+    '> [!note] Safe <img src="missing.png" onerror="alert(1)"><script>alert(1)</script>', '',
+    '```markdown', '> [!note]- Literal fence', '```', '',
+    '> `[!note]` Inline code', '', '> \\[!note] Escaped marker', '',
+    '[!note] Outside a quote'
+  ].join('\n');
+  f.file('nodes/Callouts.md',node('callouts',body));const out=f.out(),report=build({contentDir:f.content,outDir:out,basePath:'/custom/'}),text=html(out,report.articles[0]);
+  assert.match(text,/<div class="callout-title">Note<\/div>/);assert.match(text,/<div class="callout-title">-<\/div>/);assert.match(text,/<div class="callout-title">Custom <strong>title<\/strong><\/div>/);
+  assert.match(text,/<details class="callout callout-question">/);assert.doesNotMatch(text,/onerror=|javascript:|<script>alert/);
+  assert.match(text,/<blockquote>\s*<p>Ordinary <strong>quote<\/strong>\.<\/p>\s*<\/blockquote>/);
+  assert.match(text,/&gt; \[!note\]- Literal fence/);assert.match(text,/<code>\[!note\]<\/code> Inline code/);assert.match(text,/\[!note\] Escaped marker/);assert.match(text,/<p>\[!note\] Outside a quote<\/p>/);
+  assert.equal((text.match(/class="callout callout-/g)||[]).length,5);
+});

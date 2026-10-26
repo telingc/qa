@@ -46,6 +46,28 @@ function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
     return null;
   };
   const md=new MarkdownIt({html:true,linkify:true,breaks:false,highlight:(code,lang)=>lang&&hljs.getLanguage(lang)?hljs.highlight(code,{language:lang,ignoreIllegals:true}).value:esc(code)});
+  // Transform parsed quotes, so nested blocks, code and formulas keep their normal renderer.
+  md.core.ruler.after('block','atlas_callouts',state=>{
+    const groups={abstract:['abstract','summary','tldr'],info:['info','todo'],tip:['tip','hint','important'],success:['success','check','done'],question:['question','help','faq'],warning:['warning','caution','attention'],failure:['failure','fail','missing'],danger:['danger','error'],bug:['bug'],example:['example'],quote:['quote','cite']};
+    const endings=[];
+    for(let i=state.tokens.length-1;i>=0;i--){
+      const opening=state.tokens[i];
+      if(opening.type==='blockquote_close'){endings.push(opening);continue;}
+      if(opening.type!=='blockquote_open')continue;
+      const closing=endings.pop(),paragraph=state.tokens[i+1],content=state.tokens[i+2];
+      if(!closing||paragraph?.type!=='paragraph_open'||content?.type!=='inline'||state.tokens[i+3]?.type!=='paragraph_close')continue;
+      const match=content.content.match(/^\[!([a-z][a-z0-9_-]*)\]([+-])?[ \t]*([^\n]*)(?:\n|$)/i);if(!match)continue;
+      const type=match[1].toLowerCase(),family=Object.keys(groups).find(key=>groups[key].includes(type))||'note',fold=match[2];
+      opening.tag=fold?'details':'aside';opening.attrJoin('class','callout callout-'+family);if(fold==='+')opening.attrSet('open','');
+      closing.tag=opening.tag;closing.type='atlas_callout_close';
+      const titleOpen=new state.Token('callout_title_open',fold?'summary':'div',1);titleOpen.attrSet('class','callout-title');
+      const title=new state.Token('inline','',0);title.content=match[3].trim()||type[0].toUpperCase()+type.slice(1);title.children=[];
+      const titleClose=new state.Token('callout_title_close',titleOpen.tag,-1),bodyOpen=new state.Token('callout_body_open','div',1);bodyOpen.attrSet('class','callout-body');
+      content.content=content.content.slice(match[0].length);content.children=[];
+      state.tokens.splice(i+1,content.content?0:3,titleOpen,title,titleClose,bodyOpen);
+    }
+  });
+  md.renderer.rules.atlas_callout_close=(tokens,i)=>'</div>\n</'+tokens[i].tag+'>\n';
   md.inline.ruler.before('escape','atlas_math',(state,silent)=>{
     const start=state.pos;if(state.src[start]!=='$')return false;const delimiter=state.src.startsWith('$$',start)?'$$':'$';
     let end=start+delimiter.length;while((end=state.src.indexOf(delimiter,end))>=0){let slashes=0;for(let p=end-1;p>=0&&state.src[p]==='\\';p--)slashes++;if(!(slashes%2))break;end+=delimiter.length;}
@@ -71,8 +93,10 @@ function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
     if(close<0||close+2>state.eMarks[end-1])return false;if(silent)return true;
     const prose=content=>{if(content.trim()){state.push('paragraph_open','p',1);const t=state.push('inline','',0);t.content=content.trim();t.children=[];state.push('paragraph_close','p',-1);}};
     prose(state.src.slice(first,opening));
-    const token=state.push('atlas_math','',0);token.content=state.src.slice(opening+2,close);token.block=true;
     let line=start;while(line<end&&state.eMarks[line]<close+2)line++;state.line=line+1;
+    // getLines removes quote/list prefixes before TeX sees them.
+    const dequoted=state.getLines(start,line+1,state.blkIndent,false),tailLength=state.eMarks[line]-(close+2);
+    const token=state.push('atlas_math','',0);token.content=dequoted.slice(displayStart(dequoted)+2,dequoted.length-tailLength-2);token.block=true;
     prose(state.src.slice(close+2,state.eMarks[line]));
     return true;
   },{alt:['paragraph']});

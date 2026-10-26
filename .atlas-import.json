@@ -12,6 +12,7 @@
     "nodes/Electric potential.md": "5127daa25c1adfebdbe29cf05aba91c1203a1f5d5d80633ad5c0e8bc19315bed",
     "nodes/Method of Images.md": "188186e779b6364296d931f0cb55845154b4b4d7a839b6a89f476bd03049e2e8",
     "nodes/Poisson's Equation & Laplace's Equation.md": "6adb6d74d98d0ce1b8587a841875e71ff866628166d6f41a0b78dcfbac34a2a7",
+    "nodes/Separation of Variables.md": "9fa932be1006b42512bec4a2404c3494c782643bc27bc4326cce0ab908c3576d",
     "nodes/Superposition of Fields.md": "3fe96349af35c0c834b1a40ba45a9c9846aea2e250af5a891a1fecd63cf1e649",
     "nodes/The Energy of Charge Distribution.md": "a39d2ef0a6730e9e85c9c2a7ce60aace9304832ac3c8c517cc1d54b50888fa26",
     "examples/Admissible Field and Potential.md": "d47c7ed9199bbc9e4d00d8a9575ad2546e8415af8bb326a45e183515031a6a87",
@@ -94,6 +95,10 @@
     "question-mv4vnu4t-aonx": [
       "electrostatic-curl",
       "electrostatic-divergence"
+    ],
+    "question-mvlo35rc-wba7": [
+      "question-mvangpxg-jthw",
+      "question-mv4vnu4t-aonx"
     ],
     "superposition": [
       "coulomb-law"

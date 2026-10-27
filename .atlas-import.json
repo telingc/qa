@@ -9,8 +9,9 @@
     "nodes/Curl of electrostatic fields.md": "95b1de52b1a2fed49fcfb62227859daed26e26d9ed2dc87975d7b902784bfa96",
     "nodes/Divergence of Electrostatic Fields.md": "ac13a6fddff2b75808980698a955e0ec6cbb52af1fb272ea44335f58b1ffe376",
     "nodes/Electric flux & Gauss' Law.md": "b46bca4c5f103cbc427d5c0a3ce0caaf154e7d87f637ae5773cd73c0efb65a6c",
-    "nodes/Electric potential.md": "5127daa25c1adfebdbe29cf05aba91c1203a1f5d5d80633ad5c0e8bc19315bed",
+    "nodes/Electric Potential.md": "5127daa25c1adfebdbe29cf05aba91c1203a1f5d5d80633ad5c0e8bc19315bed",
     "nodes/Method of Images.md": "188186e779b6364296d931f0cb55845154b4b4d7a839b6a89f476bd03049e2e8",
+    "nodes/Multipole Approximation.md": "9bef82646f166540b259e8aee0f7cd5e18a33284109e67ab7c303d6d3320181e",
     "nodes/Poisson's Equation & Laplace's Equation.md": "6adb6d74d98d0ce1b8587a841875e71ff866628166d6f41a0b78dcfbac34a2a7",
     "nodes/Separation of Variables.md": "9fa932be1006b42512bec4a2404c3494c782643bc27bc4326cce0ab908c3576d",
     "nodes/Superposition of Fields.md": "3fe96349af35c0c834b1a40ba45a9c9846aea2e250af5a891a1fecd63cf1e649",
@@ -35,6 +36,9 @@
     "images/f508c0eb190a6a9306238545.png": "f508c0eb190a6a9306238545412365b9f2838ed553cf8953e1cb542c486fe739",
     "images/1ea7213f036cd2f15790ba73.svg": "1ea7213f036cd2f15790ba7357706542cb59cd835cbf63a693253d44bb55aa70",
     "images/44a8dc9355acbd811026793f.png": "44a8dc9355acbd811026793f9df4989a8f9af2af9338b35ce83a98abed4b02ae",
+    "images/0381693d109b5aec41e54a56.png": "0381693d109b5aec41e54a5621ba0b0f6a527f7526708d481a212e000c830b98",
+    "images/e3da9b7a83e484dcf48ada77.png": "e3da9b7a83e484dcf48ada77660cd8663b2c63283a3b8a60b67956531d150b1a",
+    "images/7bc12adc9957dfe4c1ae3479.png": "7bc12adc9957dfe4c1ae347914c922671c04630fd8786291e5af4a564249939c",
     "images/3906df69003c01770e6588b9.png": "3906df69003c01770e6588b95899b0a9a9085082ead09eabafbec56b71a3260c",
     "images/b3ccc632b2ddba938e7a9a32.png": "b3ccc632b2ddba938e7a9a3261d132158baba2b4a388c6f2264c4162f5c88b07",
     "images/3e60458e6666050e35f16999.png": "3e60458e6666050e35f1699968c780add0ac2a10f2200432412acaf6aa969449",
@@ -45,11 +49,16 @@
     "images/6ea4694f60b4fd75e970883d.png": "6ea4694f60b4fd75e970883d679426258cef25b1355ebdf07268210b787f9af1",
     "images/156bc4c8f78ada7b452fc0a6.png": "156bc4c8f78ada7b452fc0a6910063222d4f5bfa8d1b9147aaccc4728c7e74b2",
     "scripts/Nodes/boundary_conditions_and_uniqueness_theorem.py": "e172d1290df6dcfb42dc4ceef3d36ad6d027228e8f758d8cf14a2bef4d783512",
+    "scripts/Nodes/dipole_angle_geometry.py": "2b0af7a7934ccd2db535d45ff92895a37cc2f91611bb6a8b21fb8137076ba118",
+    "scripts/Nodes/dipole_comparison.py": "d0af0b2dc314cceedd46e56f38afd05afefe8d88418508109517360b12a9fe3b",
     "scripts/Nodes/hankel_learning_path.mmd": "3743406591498fd34d87d434b439399c32d224359dbb2ce6142767510f7af71d",
     "scripts/Nodes/heatmap.py": "678cff88a030c3b31230a6a54ada5a610399bcf4a1cc9d83e708d39d06c11f96",
+    "scripts/Nodes/multipole_convergence.py": "de2910fa9b6eaa95d15eccf12bfac37bf489295d22b82df4b584209ee98081f8",
+    "scripts/Nodes/multipole_geometry.py": "08affbe6e3c0bd981c5fe20ae6cf47a45677b9b65f8d0e2448cc889c81f8f37d",
     "scripts/Nodes/plane_potential_geometry.py": "f9bde620d3bbd4aa9151955fbe105501ca01d2b6365ed4e9ee6fb00731f9670e",
     "scripts/Examples/heatmap.py": "678cff88a030c3b31230a6a54ada5a610399bcf4a1cc9d83e708d39d06c11f96",
     "scripts/Examples/line_charge_potential.py": "ae82b1c75b59a4ce8af898fda5cb816ea28d9b4b47d5609409c728da48b8bfa5",
+    "scripts/Examples/multipole_convergence.py": "de2910fa9b6eaa95d15eccf12bfac37bf489295d22b82df4b584209ee98081f8",
     "scripts/Examples/radial_field_visualization.py": "c396420cac89935210f4d0d756a8a758ddfcec873bc26e1dd18a2388fcd2f955",
     "scripts/Examples/sphere_potential_heatmap.py": "4616b0b399592176900a445e6b0b5340ef07487beb173c5204f35140834da35f",
     "scripts/Examples/vector_field_curl_visualization.py": "7b19da3a083617ae267a48c52cf1b70b7ad58fda05ed989ef6e3bae8a1fc60a9"
@@ -91,6 +100,9 @@
     "question-mvi0ul67-qifo": [
       "question-mvangpxg-jthw",
       "question-mv4vnu4t-aonx"
+    ],
+    "question-mvovnicw-ab3k": [
+      "electric-potential"
     ],
     "question-mv4vnu4t-aonx": [
       "electrostatic-curl",

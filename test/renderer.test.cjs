@@ -4,6 +4,29 @@ const {build}=require('../src/export.cjs');
 function fixture(){const root=fs.mkdtempSync(path.join(os.tmpdir(),'qa-content-test-')),content=path.join(root,'content');fs.mkdirSync(content);const file=(name,text)=>{const target=path.join(content,name);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,text);return target;};return {root,content,file,out:()=>path.join(root,'out-'+Math.random())};}
 const node=(id,body='',extra='')=>'---\nid: '+id+'\nsubject: Custom subject\n'+extra+'---\n'+body;
 const html=(out,entry)=>fs.readFileSync(path.join(out,entry.url.slice('/custom/'.length),'index.html'),'utf8');
+test('qa-demo fences load only the referenced modules, once per page',()=>{
+  const f=fixture(),fence='\x60\x60\x60';
+  const body=[fence+'qa-demo','multipole-convergence',fence,'',fence+'qa-demo','dipole-limit',fence,'',
+    fence+'qa-demo','<img src=x onerror=alert(1)>',fence].join('\n');
+  f.file('nodes/Demos.md',node('demos',body));
+  const dipole=[fence+'qa-demo','dipole-limit',fence].join('\n');
+  f.file('examples/One Demo.md',node('one-demo',dipole+'\n\n'+dipole,'parent: demos\n'));
+  f.file('nodes/Plain.md',node('plain','Just Markdown.'));
+  const out=f.out(),report=build({contentDir:f.content,outDir:out,basePath:'/custom/'});
+  const page=html(out,report.articles.find(article=>article.id==='demos'));
+  assert.match(page,/data-qa-demo="multipole-convergence"/);
+  assert.match(page,/data-qa-demo="dipole-limit"/);
+  assert.doesNotMatch(page,/onerror|language-qa-demo/);
+  assert.match(report.warnings[0],/Unknown qa-demo in Demos\.md/);
+  const entries=[...page.matchAll(/type="module" src="\/custom\/(assets\/demos\.[a-f0-9]+\/[^"]+\.js)"/g)].map(match=>match[1]);
+  assert.deepEqual(entries.map(file=>path.basename(file)),['multipole-convergence.js','dipole-limit.js']);
+  for(const entry of entries)assert.ok(fs.existsSync(path.join(out,entry)));
+  assert.ok(fs.existsSync(path.join(out,path.dirname(entries[0]),'_plot.js')));
+  const example=html(out,report.examples[0]);
+  assert.equal((example.match(/type="module"/g)||[]).length,1);
+  assert.doesNotMatch(example,/multipole-convergence/);
+  assert.doesNotMatch(html(out,report.articles.find(article=>article.id==='plain')),/type="module"/);
+});
 test('Markdown builds one coherent graph; graph and resource URLs have content versions',()=>{
   const f=fixture();f.file('nodes/First.md',node('first'));f.file('nodes/Second.md',node('second','[First](First.md)'));f.file('examples/Case.md',node('case','An example.','parent: second\n'));f.file('graph.json',JSON.stringify({version:1,prerequisites:{second:['first']}}));
   const options={contentDir:f.content,basePath:'/custom/',title:'Independent atlas',blog:{label:'My blog',url:'https://example.org/'},comments:{enabled:false}},out=f.out(),report=build({...options,outDir:out}),graph=JSON.parse(fs.readFileSync(path.join(out,'atlas/graph.json'))),page=fs.readFileSync(path.join(out,'atlas/index.html'),'utf8');

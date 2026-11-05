@@ -12,3 +12,20 @@
 .post-content .callout{--callout-accent:#91b6d6;min-width:0;max-width:100%;margin:24px 0;padding:14px 18px;background:#202328;border-left:3px solid var(--callout-accent);border-radius:3px}
 .callout-title{color:var(--callout-accent);font-weight:500;line-height:1.5;overflow-wrap:anywhere}.callout summary{cursor:pointer;padding:2px 0}.callout summary:focus-visible{outline:2px solid var(--link);outline-offset:5px}.callout-body{min-width:0}.callout-body>:first-child{margin-top:12px}.callout-body>:last-child{margin-bottom:0}.post-content .callout .callout{margin:16px 0}.callout .inline-formula{padding:2px 3px}
 .post-content .callout-tip,.post-content .callout-success{--callout-accent:#a1c5af}.post-content .callout-question,.post-content .callout-warning{--callout-accent:#d4b77f}.post-content .callout-failure,.post-content .callout-danger,.post-content .callout-bug{--callout-accent:#db9b98}.post-content .callout-example{--callout-accent:#bcaed4}.post-content .callout-quote{--callout-accent:#a4abb5}
+.qa-demo{margin:24px 0;padding:18px 0;border-block:1px solid #383838;font-size:15px;line-height:1.5}
+.qa-demo-controls{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px 22px}
+.qa-demo-range{display:block;min-width:0;flex:1 1 210px}
+.qa-demo-range-label{display:flex;justify-content:space-between;gap:12px;color:var(--heading)}
+.qa-demo output{color:#9dc9f3;font-variant-numeric:tabular-nums}
+.qa-demo input[type=range]{display:block;width:100%;height:24px;margin:3px 0 0;accent-color:#87b5e4}
+.qa-demo button{min-height:36px;padding:4px 12px;color:var(--heading);background:#25282c;border:1px solid #4a535e;border-radius:4px;font:inherit;cursor:pointer}
+.qa-demo button:hover{background:#333a43}
+.qa-demo-panels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.qa-demo-panel-title{margin-bottom:6px;color:var(--heading)}
+.qa-demo canvas{display:block;width:100%;height:auto;aspect-ratio:1}
+.qa-demo-axis,.qa-demo figcaption{color:var(--muted);font-size:14px}
+.qa-demo-axis{margin-top:4px}
+.qa-demo-color{display:flex;gap:8px;align-items:center;margin-top:12px;color:var(--text);font-variant-numeric:tabular-nums}
+.qa-demo-gradient{width:116px;height:8px;background:linear-gradient(90deg,#589dda,#222c38,#ee9067)}
+.qa-demo .qa-demo-readout{margin:10px 0 6px;color:var(--heading);font-variant-numeric:tabular-nums}
+@media(max-width:520px){.qa-demo-panels{grid-template-columns:1fr}}

@@ -8,7 +8,18 @@ const hash=s=>crypto.createHash('sha256').update(s).digest('hex');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slug=id=>String(id).normalize('NFKD').replace(/[^a-zA-Z0-9-]+/g,'-').replace(/^-|-$/g,'').toLowerCase().slice(0,60)+'-'+hash(String(id)).slice(0,8);
 const {snapshot}=require('./content.cjs');
-function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
+const defaultSourceRoot=path.resolve(__dirname,'..');
+const demoSource=sourceRoot=>path.join(sourceRoot,'web','scripts','demos');
+function demoFiles(sourceRoot=defaultSourceRoot){
+  const directory=demoSource(sourceRoot);
+  if(!fs.existsSync(directory))return [];
+  return fs.readdirSync(directory,{withFileTypes:true})
+    .filter(entry=>entry.isFile()&&/^_?[a-z0-9]+(?:-[a-z0-9]+)*\.js$/.test(entry.name))
+    .map(entry=>entry.name).sort();
+}
+// Underscored modules are shared helpers. Each other filename is a Markdown demo ID.
+const demoIds=files=>new Set(files.filter(file=>!file.startsWith('_')).map(file=>file.slice(0,-3)));
+function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{},registered=demoIds(demoFiles())){
   const notesByFile=new Map(data.allNotes.map(n=>[path.resolve(n.file),n]));
   const published=new Map([...data.nodes,...data.examples].map(n=>[n.file,n]));
   const listFiles=dir=>fs.readdirSync(dir,{withFileTypes:true}).filter(e=>!e.name.startsWith('.')&&!e.isSymbolicLink()).flatMap(e=>e.isDirectory()?listFiles(path.join(dir,e.name)):[path.join(dir,e.name)]);
@@ -46,6 +57,18 @@ function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
     return null;
   };
   const md=new MarkdownIt({html:true,linkify:true,breaks:false,highlight:(code,lang)=>lang&&hljs.getLanguage(lang)?hljs.highlight(code,{language:lang,ignoreIllegals:true}).value:esc(code)});
+  const renderFence=md.renderer.rules.fence;
+  md.renderer.rules.fence=(tokens,i,options,env,self)=>{
+    const token=tokens[i];
+    if(token.info.trim()!=='qa-demo')return renderFence(tokens,i,options,env,self);
+    const id=token.content.trim();
+    if(!registered.has(id)){
+      warnings.push('Unknown qa-demo in '+path.basename(env.file)+': '+JSON.stringify(id));
+      return '<p class="unavailable">Interactive diagram unavailable.</p>\n';
+    }
+    env.usedDemos?.add(id);
+    return '<figure class="qa-demo" data-qa-demo="'+esc(id)+'"><figcaption>This interactive diagram needs JavaScript.</figcaption></figure>\n';
+  };
   // Transform parsed quotes, so nested blocks, code and formulas keep their normal renderer.
   md.core.ruler.after('block','atlas_callouts',state=>{
     const groups={abstract:['abstract','summary','tldr'],info:['info','todo'],tip:['tip','hint','important'],success:['success','check','done'],question:['question','help','faq'],warning:['warning','caution','attention'],failure:['failure','fail','missing'],danger:['danger','error'],bug:['bug'],example:['example'],quote:['quote','cite']};
@@ -119,9 +142,9 @@ function makeRenderer(data,base,assets,warnings,sources,onReference=()=>{}){
   });
   const cleanHTML=(html,env)=>sanitize(html,{allowedTags:[...sanitize.defaults.allowedTags,'img'],allowedAttributes:{'*':['class','id'],a:['href','title'],img:['src','alt','title','width','height'],th:['colspan','rowspan','scope'],td:['colspan','rowspan']},allowedSchemes:['http','https','mailto'],transformTags:{img:(tag,attrs)=>{const src=localImage(attrs.src||'',env.file);return {tagName:'img',attribs:src?{src,alt:attrs.alt||''}:{alt:'Image unavailable'}};},a:(tag,attrs)=>({tagName:'a',attribs:{...attrs,href:localLink(attrs.href||'',env.file)||'#unpublished'}})}});
   for(const type of ['html_inline','html_block'])md.renderer.rules[type]=(tokens,i,opts,env)=>cleanHTML(tokens[i].content,env);
-  return note=>{
+  return (note,usedDemos)=>{
     // Only raw author HTML is sanitized. Markdown text, code and TeX retain their original content.
-    const output=md.render(note.body,{file:note.file});
+    const output=md.render(note.body,{file:note.file,usedDemos});
     return output.replace(/<table\b[\s\S]*?<\/table>/g,table=>'<div class="table-scroll" tabindex="0" role="region" aria-label="Data table; scroll horizontally if needed">'+table+'</div>');
   };
 }
@@ -139,30 +162,36 @@ function graphData(data,base){
   }
   return {version:1,nodes,edges,width:layout.width,height:layout.height};
 }
-function build({contentDir,basePath='/qa/',title='My atlas',tagline='A learning process, left open.',intro='Working notes. Questions, attempts, and revisions.',blog=null,outDir,sourceRoot=path.resolve(__dirname,'..'),github={},comments={enabled:false}}){
+function build({contentDir,basePath='/qa/',title='My atlas',tagline='A learning process, left open.',intro='Working notes. Questions, attempts, and revisions.',blog=null,outDir,sourceRoot=defaultSourceRoot,github={},comments={enabled:false}}){
   if(!/^\/[a-zA-Z0-9_\/-]*\/$/.test(basePath)&&basePath!=='/')throw Error('basePath must be an absolute URL path ending in /');
   const data=snapshot(contentDir),sources=collectSources(data.vault,github),commentSettings=commentConfig(comments,sources.repository);outDir=path.resolve(outDir);if(outDir===data.vault||outDir.startsWith(data.vault+path.sep)||data.vault.startsWith(outDir+path.sep))throw Error('Output must be separate from content');
   if(fs.existsSync(outDir)&&fs.readdirSync(outDir).length)throw Error('Build output must be empty; use the build command for transactional replacement');
   fs.mkdirSync(outDir,{recursive:true});const write=(file,text)=>{const target=path.join(outDir,file);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,text);};
-  const base=basePath,assets=new Map(),warnings=[],render=makeRenderer(data,base,assets,warnings,sources);
+  const files=demoFiles(sourceRoot);
+  const modules=files.map(name=>[name,fs.readFileSync(path.join(demoSource(sourceRoot),name))]);
+  const demoVersion=hash(JSON.stringify(modules.map(([name,bytes])=>[name,hash(bytes)]))).slice(0,16);
+  const demoDirectory='assets/demos.'+demoVersion+'/';
+  const base=basePath,assets=new Map(),warnings=[],render=makeRenderer(data,base,assets,warnings,sources,undefined,demoIds(files));
   const graph=graphData(data,base),graphVersion=hash(JSON.stringify(graph)).slice(0,16);graph.dataVersion=graphVersion;
   const graphFile='atlas/graph.'+graphVersion+'.json';
   const assetURL=name=>base+'assets/'+name.replace(/(\.[^.]+)$/,'.'+hash(fs.readFileSync(path.join(sourceRoot,'web',name))).slice(0,16)+'$1');
   const safeBlog=blog&&/^https?:\/\//.test(blog.url||'')?blog:null;
-  const shell=(heading,content,{atlas=false,article=false,back=base}={})=>{
+  const shell=(heading,content,{atlas=false,article=false,back=base,usedDemos=[]}={})=>{
     const head='<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(heading)+' · '+esc(title)+'</title><meta name="description" content="Working notes, questions, and concrete examples. A public window into an unfinished learning process."><link rel="icon" href="'+base+'assets/atlas-mark.svg" type="image/svg+xml"><link rel="stylesheet" href="'+assetURL('main.css')+'"><link rel="stylesheet" href="'+base+'assets/katex/katex.min.css"></head>';
     const header='<header class="site-header"><div class="wrap"><div class="site-brand"><img class="site-mark" src="'+base+'assets/atlas-mark.svg" width="40" height="40" alt=""><a class="site-title" href="'+base+'">'+esc(title)+'</a></div>'+(atlas?'':'<nav><a href="'+base+'atlas/">Atlas</a></nav>')+'</div></header>';
     const footer='<footer class="wrap"><div>'+esc(tagline)+'</div>'+(safeBlog?'<a class="blog-link" href="'+esc(safeBlog.url)+'">'+esc(safeBlog.label||'Blog')+'</a>':'')+'</footer>';
-    return head+'<body data-base="'+base+'" data-graph="'+base+graphFile+'"'+(atlas?' class="atlas-page"':'')+'>'+header+'<main class="wrap '+(atlas?'map-wrap':'')+'">'+(article?'<div class="article-nav"><a id="back-link" href="'+esc(back)+'">Back</a></div>':'')+content+'</main>'+footer+'<script src="'+assetURL('app.js')+'" defer></script>'+(article&&commentSettings.ready?'<script src="'+assetURL('comments.js')+'" defer></script>':'')+'</body></html>';
+    const scripts=Array.from(usedDemos,id=>'<script type="module" src="'+base+demoDirectory+id+'.js"></script>').join('');
+    return head+'<body data-base="'+base+'" data-graph="'+base+graphFile+'"'+(atlas?' class="atlas-page"':'')+'>'+header+'<main class="wrap '+(atlas?'map-wrap':'')+'">'+(article?'<div class="article-nav"><a id="back-link" href="'+esc(back)+'">Back</a></div>':'')+content+'</main>'+footer+'<script src="'+assetURL('app.js')+'" defer></script>'+scripts+(article&&commentSettings.ready?'<script src="'+assetURL('comments.js')+'" defer></script>':'')+'</body></html>';
   };
   const groups=[...new Set(data.nodes.map(n=>n.subject))];
   write('index.html',shell('Notes','<div class="home"><p class="intro">'+esc(intro)+'</p>'+(!data.nodes.length?'<p>No published notes yet.</p>':groups.map(group=>'<section><h2>'+esc(group)+'</h2><ul class="posts">'+data.nodes.filter(n=>n.subject===group).sort((a,b)=>a.title.localeCompare(b.title)).map(n=>'<li><a class="post-link" href="'+base+n.href+'">'+esc(n.title)+'</a><span class="post-domain">'+esc(n.domain)+'</span></li>').join('')+'</ul></section>').join(''))+'</div>'));
-  for(const n of data.nodes){const examples=data.examples.filter(e=>e.parent===n.id);const body='<article class="post-content"><header class="post-header"><p class="eyebrow">'+esc(n.domain)+' · Working draft</p><h1>'+esc(n.title)+'</h1></header>'+render(n)+(examples.length?'<section class="article-examples"><h2>Examples</h2><ul>'+examples.map(e=>'<li><a href="'+base+e.href+'">'+esc(e.title)+'</a></li>').join('')+'</ul></section>':'')+'</article>';
-    write(n.href+'index.html',shell(n.title,body+commentsHTML(n,'node',commentSettings),{article:true}));}
-  for(const e of data.examples){const parent=data.nodes.find(n=>n.id===e.parent);write(e.href+'index.html',shell(e.title,'<article class="post-content"><header class="post-header"><p class="eyebrow">Example · <a href="'+base+parent.href+'">'+esc(parent.title)+'</a></p><h1>'+esc(e.title)+'</h1></header>'+render(e)+'</article>'+commentsHTML(e,'example',commentSettings),{article:true}));}
+  for(const n of data.nodes){const usedDemos=new Set(),examples=data.examples.filter(e=>e.parent===n.id);const body='<article class="post-content"><header class="post-header"><p class="eyebrow">'+esc(n.domain)+' · Working draft</p><h1>'+esc(n.title)+'</h1></header>'+render(n,usedDemos)+(examples.length?'<section class="article-examples"><h2>Examples</h2><ul>'+examples.map(e=>'<li><a href="'+base+e.href+'">'+esc(e.title)+'</a></li>').join('')+'</ul></section>':'')+'</article>';
+    write(n.href+'index.html',shell(n.title,body+commentsHTML(n,'node',commentSettings),{article:true,usedDemos}));}
+  for(const e of data.examples){const usedDemos=new Set(),parent=data.nodes.find(n=>n.id===e.parent);write(e.href+'index.html',shell(e.title,'<article class="post-content"><header class="post-header"><p class="eyebrow">Example · <a href="'+base+parent.href+'">'+esc(parent.title)+'</a></p><h1>'+esc(e.title)+'</h1></header>'+render(e,usedDemos)+'</article>'+commentsHTML(e,'example',commentSettings),{article:true,usedDemos}));}
   write(graphFile,JSON.stringify(graph));write('atlas/graph.json',JSON.stringify(graph));
   write('atlas/index.html',shell('Atlas','<section class="atlas"><div class="atlas-heading"><div><p class="eyebrow">A map of the published notes</p><h1>Atlas</h1></div><div class="map-actions"><a id="details-link" aria-disabled="true">Details</a><a href="'+base+'">Back</a></div></div><p id="selection-label" class="selection-label">Select a question or an example.</p><div id="map-host"><svg id="atlas-map" aria-label="Knowledge questions and their examples"></svg></div><p class="map-hint">Scroll to zoom · drag to pan · select, then Details</p></section>',{atlas:true}));
   for(const name of ['main.css','app.js','comments.js','atlas-mark.svg']){const bytes=fs.readFileSync(path.join(sourceRoot,'web',name));write('assets/'+name,bytes);if(name!=='atlas-mark.svg')write(assetURL(name).slice(base.length),bytes);}
+  for(const [name,bytes] of modules)write(demoDirectory+name,bytes);
   const katexDist=path.join(path.dirname(require.resolve('katex/package.json')),'dist');fs.cpSync(path.join(katexDist,'katex.min.css'),path.join(outDir,'assets/katex/katex.min.css'));fs.cpSync(path.join(katexDist,'fonts'),path.join(outDir,'assets/katex/fonts'),{recursive:true});
   write('assets/katex/LICENSE.txt',fs.readFileSync(path.join(path.dirname(katexDist),'LICENSE')));
   for(const [name,bytes]of assets)write('assets/images/'+name,bytes);

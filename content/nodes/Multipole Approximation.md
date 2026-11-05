@@ -15,26 +15,29 @@ And the expansion above is theoretically exact, but even better, it's useful as 
 Computationally, expansions have the advantage of controlling the accuracy for different cases.
 ## Experiments: Approximation Accuracy
 
-We use [heatmap](../scripts/Nodes/heatmap.py) and [the demo script](../scripts/Nodes/multipole_convergence.py) to compare three cumulative multipole approximations with the exact Coulomb potential.
+We use [heatmap](../scripts/Nodes/heatmap.py) and [the demo script](../scripts/Nodes/multipole_convergence.py) as a numerical reference for the first three truncations. The experiment below uses $+2q$ at $z=a$ and $-q$ at $z=-a$, with $V_0=q/(4\pi\epsilon_0 a)$. Change the highest included order and compare both error regions.
 
 Before choosing a truncation order, we specify the observation region. All source charges lie within $r'\leq a$, so the exterior multipole series converges for $r>a$. As we approach this boundary from outside, $a/r$ approaches one, and more terms are generally needed to achieve the same accuracy.
 
-![Knowledge Atlas/Nodes/images/multipole_convergence.png](../images/e3da9b7a83e484dcf48ada77.png)
+```qa-demo
+multipole-convergence
+```
 
-The solid circle marks $r=a$. The dashed circle marks our chosen comparison radius, $r=2a$; neither circle is a physical surface.
-
-We display both the interior and exterior to make the limitations visible. Inside $r=a$, the external partial sums illustrate failure rather than convergence. Adding more terms does not make this exterior expansion valid there.
-
-The heatmaps share the same color scale. Sampled RMS errors are reported separately for $a<r<2a$ and $r\geq2a$. These compare overall accuracy; errors need not decrease monotonically at every point.
+The shared color scale lets us compare the same potential values across both panels. The RMS values describe two sampled regions. Pick a point near $r=a$ and consider how much a higher order would help there.
 ## Physical Dipole & Ideal Dipole
 
 > *Dipole is a really meaningful topic for this repo, I was daydreaming in the physical class, then I decided to visualize something fun, then the physical dipole was my first choice.*
 
-![dipole_comparison.png](../images/7bc12adc9957dfe4c1ae3479.png)
-
 The structure of a physical dipole is quite straight forward, a physical electric dipole consists of two equal and opposite point charges, $+q$ and $-q$, separated by a finite distance $d>0$.
 
 An ideal (point) electric dipole is obtained by taking the limit $d\to0$ and $q\to\infty$, while keeping the dipole moment $\mathbf p=q\mathbf d$ fixed. A physical dipole can be approximated by an ideal dipole when the observation distance is much greater than its separation, $r\gg d$.
+
+The experiment fixes $p=qd$ and uses a fixed length $L$ for both views, with $V_0=p/(4\pi\epsilon_0 L^2)$. Play the convergence or move the separation slider. Compare the finite pair with the ideal reference at the same observation point.
+
+```qa-demo
+dipole-limit
+```
+
 ## Dipole Moment
 For a physical dipole, the electric dipole moment is a vector $\displaystyle \mathbf p=q(\mathbf r'_+-\mathbf r'_-)$ pointing the direction from the negative charge to the positive charge. But the dipole moment become informative when it comes to the continuous charge distribution cases.$$\mathbf p\equiv\int\mathbf r'\rho(\mathbf r')\,d\tau'$$Since the textbooks has given the exact definition, I'll note some of my intuitions here:
 - **For a neutral distribution, the dipole moment measures the separation between the positive and negative charge distributions.** It captures one aspect of the distribution; a vanishing dipole moment does not imply a vanishing electric field.

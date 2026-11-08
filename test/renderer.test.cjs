@@ -4,6 +4,20 @@ const {build}=require('../src/export.cjs');
 function fixture(){const root=fs.mkdtempSync(path.join(os.tmpdir(),'qa-content-test-')),content=path.join(root,'content');fs.mkdirSync(content);const file=(name,text)=>{const target=path.join(content,name);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,text);return target;};return {root,content,file,out:()=>path.join(root,'out-'+Math.random())};}
 const node=(id,body='',extra='')=>'---\nid: '+id+'\nsubject: Custom subject\n'+extra+'---\n'+body;
 const html=(out,entry)=>fs.readFileSync(path.join(out,entry.url.slice('/custom/'.length),'index.html'),'utf8');
+
+test('molecular polarization demos load independently, repeated hosts share only module code',()=>{
+  const f=fixture(),fence='\x60\x60\x60',ids=['co2-polarization','water-dipole','dielectric-dipoles'];
+  const body=ids.flatMap(id=>Array(2).fill([fence+'qa-demo',id,fence].join('\n'))).join('\n\n');
+  f.file('nodes/Polarization.md',node('polarization',body));
+  const out=f.out(),report=build({contentDir:f.content,outDir:out,basePath:'/custom/'}),page=html(out,report.articles[0]);
+  assert.deepEqual(report.warnings,[]);
+  for(const id of ids) {
+    assert.equal((page.match(new RegExp('data-qa-demo="'+id+'"','g'))||[]).length,2);
+    assert.equal((page.match(new RegExp('/'+id+'\\.js"','g'))||[]).length,1);
+  }
+  const directory=page.match(/assets\/demos\.[a-f0-9]+/)[0];
+  assert.ok(fs.existsSync(path.join(out,directory,'_polarization.js')));
+});
 test('qa-demo fences load only the referenced modules, once per page',()=>{
   const f=fixture(),fence='\x60\x60\x60';
   const body=[fence+'qa-demo','multipole-convergence',fence,'',fence+'qa-demo','dipole-limit',fence,'',
@@ -27,6 +41,20 @@ test('qa-demo fences load only the referenced modules, once per page',()=>{
   assert.doesNotMatch(example,/multipole-convergence/);
   assert.doesNotMatch(html(out,report.articles.find(article=>article.id==='plain')),/type="module"/);
 });
+test('atomic polarization is discovered automatically and repeated fences load one module',()=>{
+  const f=fixture(),fence='\x60\x60\x60';
+  const body=[fence+'qa-demo','atomic-polarization',fence].join('\n');
+  f.file('nodes/Atom.md',node('atom',body+'\n\n'+body));
+  const out=f.out(),report=build({contentDir:f.content,outDir:out,basePath:'/custom/'}),page=html(out,report.articles[0]);
+  assert.deepEqual(report.warnings,[]);
+  assert.equal((page.match(/data-qa-demo="atomic-polarization"/g)||[]).length,2);
+  const entries=[...page.matchAll(/type="module" src="\/custom\/(assets\/demos\.[a-f0-9]+\/[^"]+\.js)"/g)].map(match=>match[1]);
+  assert.equal(entries.length,1);
+  assert.equal(path.basename(entries[0]),'atomic-polarization.js');
+  assert.ok(fs.existsSync(path.join(out,entries[0])));
+  assert.ok(fs.existsSync(path.join(out,path.dirname(entries[0]),'_plot.js')));
+});
+
 test('Markdown builds one coherent graph; graph and resource URLs have content versions',()=>{
   const f=fixture();f.file('nodes/First.md',node('first'));f.file('nodes/Second.md',node('second','[First](First.md)'));f.file('examples/Case.md',node('case','An example.','parent: second\n'));f.file('graph.json',JSON.stringify({version:1,prerequisites:{second:['first']}}));
   const options={contentDir:f.content,basePath:'/custom/',title:'Independent atlas',blog:{label:'My blog',url:'https://example.org/'},comments:{enabled:false}},out=f.out(),report=build({...options,outDir:out}),graph=JSON.parse(fs.readFileSync(path.join(out,'atlas/graph.json'))),page=fs.readFileSync(path.join(out,'atlas/index.html'),'utf8');

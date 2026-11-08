@@ -11,8 +11,9 @@
     "nodes/Electric flux & Gauss' Law.md": "b46bca4c5f103cbc427d5c0a3ce0caaf154e7d87f637ae5773cd73c0efb65a6c",
     "nodes/Electric Potential.md": "5127daa25c1adfebdbe29cf05aba91c1203a1f5d5d80633ad5c0e8bc19315bed",
     "nodes/Method of Images.md": "188186e779b6364296d931f0cb55845154b4b4d7a839b6a89f476bd03049e2e8",
-    "nodes/Multipole Approximation.md": "9bef82646f166540b259e8aee0f7cd5e18a33284109e67ab7c303d6d3320181e",
+    "nodes/Multipole Approximation.md": "10a1e2d94058d11f54a60fb0da5639570474a1dee6f249c9433ced9ed1d61e28",
     "nodes/Poisson's Equation & Laplace's Equation.md": "6adb6d74d98d0ce1b8587a841875e71ff866628166d6f41a0b78dcfbac34a2a7",
+    "nodes/Polarization.md": "c1ccc7ae3cfa99b1ca9af16a45942ef21682a2b0211d4f5c9392bba600c59569",
     "nodes/Separation of Variables.md": "9fa932be1006b42512bec4a2404c3494c782643bc27bc4326cce0ab908c3576d",
     "nodes/Superposition of Fields.md": "3fe96349af35c0c834b1a40ba45a9c9846aea2e250af5a891a1fecd63cf1e649",
     "nodes/The Energy of Charge Distribution.md": "a39d2ef0a6730e9e85c9c2a7ce60aace9304832ac3c8c517cc1d54b50888fa26",
@@ -40,8 +41,6 @@
     "images/1ea7213f036cd2f15790ba73.svg": "1ea7213f036cd2f15790ba7357706542cb59cd835cbf63a693253d44bb55aa70",
     "images/44a8dc9355acbd811026793f.png": "44a8dc9355acbd811026793f9df4989a8f9af2af9338b35ce83a98abed4b02ae",
     "images/0381693d109b5aec41e54a56.png": "0381693d109b5aec41e54a5621ba0b0f6a527f7526708d481a212e000c830b98",
-    "images/e3da9b7a83e484dcf48ada77.png": "e3da9b7a83e484dcf48ada77660cd8663b2c63283a3b8a60b67956531d150b1a",
-    "images/7bc12adc9957dfe4c1ae3479.png": "7bc12adc9957dfe4c1ae347914c922671c04630fd8786291e5af4a564249939c",
     "images/3906df69003c01770e6588b9.png": "3906df69003c01770e6588b95899b0a9a9085082ead09eabafbec56b71a3260c",
     "images/b3ccc632b2ddba938e7a9a32.png": "b3ccc632b2ddba938e7a9a3261d132158baba2b4a388c6f2264c4162f5c88b07",
     "images/3e60458e6666050e35f16999.png": "3e60458e6666050e35f1699968c780add0ac2a10f2200432412acaf6aa969449",
@@ -110,6 +109,9 @@
     "question-mv4vnu4t-aonx": [
       "electrostatic-curl",
       "electrostatic-divergence"
+    ],
+    "question-mw22t16e-gtwx": [
+      "question-mvovnicw-ab3k"
     ],
     "question-mvlo35rc-wba7": [
       "question-mvangpxg-jthw",

@@ -2,6 +2,34 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
+test('a polarized slab has opposite end normals and conserves total bound charge', async () => {
+  const {polarizationProfile} = await import('../web/scripts/demos/bound-charge-slices.js');
+  const uniform = polarizationProfile(0);
+  assert.deepEqual([uniform.surfaceLeft, uniform.surfaceRight, uniform.volumeCharge], [-1, 1, 0]);
+  for (const [gradient,left,right] of [[1,-0.5,1.5],[-1,-1.5,0.5]]) {
+    const profile = polarizationProfile(gradient);
+    assert.equal(profile.surfaceLeft,left);
+    assert.equal(profile.surfaceRight,right);
+    assert.equal(profile.volumeCharge,-gradient);
+    assert.equal(profile.volumeCharge + left + right,0);
+    // Integral flux per unit volume for a box spanning the inner half of the slab.
+    assert.equal((profile.at(0.75) - profile.at(0.25)) / 0.5,profile.divergence);
+  }
+});
+
+test('fixed cross section relates the swept charge to the normal polarization', async () => {
+  const {crossingQuantities} = await import('../web/scripts/demos/bound-charge-crossing.js');
+  for (const shift of [0, 0.5, 2.5]) {
+    const {volume, pairs, charge, moment, normalPolarization} = crossingQuantities(shift);
+    const area = 3 * 3;
+    assert.equal(volume, area * shift);
+    assert.equal(pairs, volume);
+    assert.equal(charge, pairs);
+    assert.equal(moment, shift);
+    assert.equal(charge / area, normalPolarization);
+  }
+});
+
 test('planar rotor statistics approach the Boltzmann angular average and weaken as temperature rises',async()=>{
   const {rotorStep}=await import('../web/scripts/demos/dielectric-dipoles.js');
   let seed=2137;

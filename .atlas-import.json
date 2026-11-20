@@ -2,6 +2,7 @@
   "version": 1,
   "files": {
     "nodes/Basic Properties of Conductors.md": "b746bd25a27c78a27a3ea62731d3d66f5551900c6891dd2c06283bff4100cd6a",
+    "nodes/Bound Charges & Fields of Polarized Objects.md": "cab2ac5931f848b967a6657a2261e2816f4e457bfa16f488b4b19e35a77ac3d3",
     "nodes/Boundary Conditions & Uniqueness Theorems.md": "6833e6522c0fb00218c8ba08edbb622efee41e2c73d602ece4d3f81a5e1fdc7f",
     "nodes/Boundary Conditions.md": "1bcc596db20fef56b26bd94acefa4029bab096bbc72cddf25a049c74790e68c6",
     "nodes/Capacitors.md": "6cbef32a59de8919e77da58443ec4c01366ce6edf2a34442756efd2b3878bf17",
@@ -70,6 +71,9 @@
       "coulomb-law",
       "electric-potential",
       "superposition"
+    ],
+    "question-mwcxjb7t-ntzc": [
+      "question-mw22t16e-gtwx"
     ],
     "question-mvangpxg-jthw": [
       "question-mv8xnsjg-7y69",

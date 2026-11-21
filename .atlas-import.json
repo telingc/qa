@@ -9,6 +9,7 @@
     "nodes/Coulomb's law & Electrostatic Fields.md": "9af8ca9ca6555f5da51385d9f6b71a27e95198b27b7bac95b77da1dc925df599",
     "nodes/Curl of electrostatic fields.md": "95b1de52b1a2fed49fcfb62227859daed26e26d9ed2dc87975d7b902784bfa96",
     "nodes/Divergence of Electrostatic Fields.md": "ac13a6fddff2b75808980698a955e0ec6cbb52af1fb272ea44335f58b1ffe376",
+    "nodes/Electric Displacement.md": "775711af0293c0715ff47c6d2b11f3711008e022feca9bdac9fe085e0d63d005",
     "nodes/Electric flux & Gauss' Law.md": "b46bca4c5f103cbc427d5c0a3ce0caaf154e7d87f637ae5773cd73c0efb65a6c",
     "nodes/Electric Potential.md": "5127daa25c1adfebdbe29cf05aba91c1203a1f5d5d80633ad5c0e8bc19315bed",
     "nodes/Method of Images.md": "188186e779b6364296d931f0cb55845154b4b4d7a839b6a89f476bd03049e2e8",
@@ -94,6 +95,9 @@
     ],
     "electrostatic-divergence": [
       "electric-flux"
+    ],
+    "question-mwprqyv4-nxur": [
+      "question-mwcxjb7t-ntzc"
     ],
     "electric-flux": [
       "coulomb-law",
